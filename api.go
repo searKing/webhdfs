@@ -17,7 +17,7 @@ const (
 	OpGetXAttr                      = "GETXATTRS"
 	OpGetXAttrs                     = "GETXATTRS"
 	OpGetAllXAttrs                  = "GETXATTRS"
-	OpGetListXAttrs                 = "LISTXATTRS"
+	OpListXAttrs                 = "LISTXATTRS"
 	OpCheckAccess                   = "CHECKACCESS"
 	OpGetAllStoragePolicy           = "GETALLSTORAGEPOLICY"
 	OpGetStoragePolicy              = "GETSTORAGEPOLICY"
