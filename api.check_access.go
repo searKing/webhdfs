@@ -64,8 +64,8 @@ func (resp *CheckAccessResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	return nil
 }
 
-// List a File/Directory
-// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#List_a_Directory
+// Check access
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Check_access
 func (c *Client) CheckAccess(req *CheckAccessRequest) (*CheckAccessResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {

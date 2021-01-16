@@ -47,8 +47,8 @@ func (resp *GetAllStoragePolicyResponse) UnmarshalHTTP(httpResp *http.Response) 
 	return nil
 }
 
-// Get all XAttrs
-// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Get_all_XAttrs
+// Get all Storage Policies
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Get_all_Storage_Policies
 func (c *Client) GetAllStoragePolicy(req *GetAllStoragePolicyRequest) (*GetAllStoragePolicyResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {

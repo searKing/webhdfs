@@ -52,8 +52,8 @@ func (resp *ListXAttrsResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	return nil
 }
 
-// List a File/Directory
-// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#List_a_Directory
+// List all XAttrs
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#List_all_XAttrs
 func (c *Client) ListXAttrs(req *ListXAttrsRequest) (*ListXAttrsResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {

@@ -33,13 +33,12 @@ type Token struct {
 	UrlString string `json:"urlString" validate:"required"` // A delegation token encoded as a URL safe string.
 }
 
-//go:generate go-enum -type FileType -trimprefix=FileType --transform=upper
-type FileType int
+type FileType string
 
 const (
-	FileTypeFile FileType = iota
-	Directory    FileType = iota
-	Symlink      FileType = iota
+	FileTypeFile FileType = "FILE"
+	Directory    FileType = "DIRECTORY"
+	Symlink      FileType = "SYMLINK"
 )
 
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#FileStatus_JSON_Schema
@@ -56,7 +55,7 @@ type FileStatus struct {
 	Permission       string        `json:"permission" validate:"required"`       // The permission represented as a octal string.
 	Replication      int           `json:"replication" validate:"required"`      // The number of replication of a file.
 	Symlink          string        `json:"symlink"`                              // The link target of a symlink.
-	Type             FileType      `json:"type" validate:"required"`             // The type of the path object.
+	Type             FileType      `json:"type" validate:"required"`             // The type of the path object. ["FILE", "DIRECTORY", "SYMLINK"]
 }
 
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#FileStatuses_JSON_Schema
@@ -148,3 +147,27 @@ type BlockStoragePolicyProperties struct {
 	CreationFallbacks    []string `json:"creationFallbacks" validate:"required"`    // An array of fallback storage types for file creation.
 	CopyOnCreate         bool     `json:"copyOnCreateFile" validate:"required"`     // If set then the policy cannot be changed after file creation.
 }
+
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#SnapshotDiffReport_JSON_Schema
+type SnapshotDiffReport struct {
+	DiffList     []DiffReportEntry `json:"diffList" validate:"required"`     // An array of DiffReportEntry.
+	FromSnapshot string            `json:"fromSnapshot" validate:"required"` // Source snapshot.
+	SnapshotRoot string            `json:"snapshotRoot" validate:"required"` // String representation of snapshot root path.
+	ToSnapshot   string            `json:"toSnapshot" validate:"required"`   // Destination snapshot.
+}
+
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#DiffReport_Entries
+type DiffReportEntry struct {
+	SourcePath string              `json:"sourcePath" validate:"required"` // Source path name relative to snapshot root.
+	TargetPath string              `json:"targetPath" validate:"required"` // Target path relative to snapshot root used for renames.
+	Type       DiffReportEntryType `json:"type" validate:"required"`       // Type of diff report entry`["CREATE", "MODIFY", "DELETE", "RENAME"]
+}
+
+type DiffReportEntryType string
+
+const (
+	DiffReportEntryTypeCreate DiffReportEntryType = "CREATE"
+	DiffReportEntryTypeModify DiffReportEntryType = "MODIFY"
+	DiffReportEntryTypeDelete DiffReportEntryType = "DELETE"
+	DiffReportEntryTypeRename DiffReportEntryType = "RENAME"
+)

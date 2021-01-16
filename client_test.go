@@ -236,3 +236,16 @@ func TestClient_GetStoragePolicy(t *testing.T) {
 	t.Logf("BlockStoragePolicy: %v", resp.BlockStoragePolicy)
 	// client_test.go:233: webhdfs GetAllStoragePolicy failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.GetOpParam.Op.GETSTORAGEPOLICY in java.lang.IllegalArgumentException
 }
+
+func TestClient_GetSnapshotDiff(t *testing.T) {
+	resp, err := getClient(t).GetSnapshotDiff(&webhdfs.GetSnapshotDiffRequest{
+		Oldsnapshotname: aws.String("test_old"),
+		Snapshotname:    aws.String("test"),
+	})
+	if err != nil {
+		t.Fatalf("webhdfs GetAllStoragePolicy failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("SnapshotDiffReport: %v", resp.SnapshotDiffReport)
+	// client_test.go:247: webhdfs GetAllStoragePolicy failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.GetOpParam.Op.GETSNAPSHOTDIFF in java.lang.IllegalArgumentException
+}
