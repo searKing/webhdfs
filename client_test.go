@@ -203,3 +203,16 @@ func TestClient_ListXAttrs(t *testing.T) {
 	t.Logf("XAttrNames: %v", resp.XAttrNames)
 	// client_test.go:203: XAttrNames: {[]}
 }
+
+func TestClient_CheckAccess(t *testing.T) {
+	resp, err := getClient(t).CheckAccess(&webhdfs.CheckAccessRequest{
+		Path:     aws.String("/data/test/core-site.xml"),
+		Fsaction: aws.String("[r-][w-][x-]"),
+	})
+	if err != nil {
+		t.Fatalf("webhdfs GetXAttrs failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("ContentLength: %v", aws.Int64Value(resp.ContentLength))
+	// client_test.go:203: XAttrNames: {[]}
+}
