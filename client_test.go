@@ -223,6 +223,16 @@ func TestClient_GetAllStoragePolicy(t *testing.T) {
 		t.Fatalf("webhdfs GetAllStoragePolicy failed: %s", err)
 	}
 	defer resp.Body.Close()
-	t.Logf("ContentLength: %v", aws.Int64Value(resp.ContentLength))
-	// client_test.go:203: XAttrNames: {[]}
+	t.Logf("BlockStoragePolicies: %v", resp.BlockStoragePolicies)
+	// client_test.go:223: webhdfs GetAllStoragePolicy failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.GetOpParam.Op.GETALLSTORAGEPOLICY in java.lang.IllegalArgumentException
+}
+
+func TestClient_GetStoragePolicy(t *testing.T) {
+	resp, err := getClient(t).GetStoragePolicy(&webhdfs.GetStoragePolicyRequest{})
+	if err != nil {
+		t.Fatalf("webhdfs GetAllStoragePolicy failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("BlockStoragePolicy: %v", resp.BlockStoragePolicy)
+	// client_test.go:233: webhdfs GetAllStoragePolicy failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.GetOpParam.Op.GETSTORAGEPOLICY in java.lang.IllegalArgumentException
 }

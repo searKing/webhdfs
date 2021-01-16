@@ -134,6 +134,11 @@ type BlockStoragePolicies struct {
 	BlockStoragePolicies []BlockStoragePolicyProperties `json:"BlockStoragePolicy" validate:"required"` // An array of BlockStoragePolicy.
 }
 
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#BlockStoragePolicy_JSON_Schema
+type BlockStoragePolicy struct {
+	BlockStoragePolicy BlockStoragePolicyProperties `json:"BlockStoragePolicy" validate:"required"` // An BlockStoragePolicy.
+}
+
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#BlockStoragePolicy_Properties
 type BlockStoragePolicyProperties struct {
 	Id                   int      `json:"id" validate:"required"`                   // Policy ID.
