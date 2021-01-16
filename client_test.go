@@ -185,7 +185,7 @@ func TestClient_GetAllXAttrs(t *testing.T) {
 		Encoding: webhdfs.XAttrValueEncodingText.New(),
 	})
 	if err != nil {
-		t.Fatalf("webhdfs GetXAttrs failed: %s", err)
+		t.Fatalf("webhdfs GetAllXAttrs failed: %s", err)
 	}
 	defer resp.Body.Close()
 	t.Logf("XAttrs: %v", resp.XAttrs)
@@ -197,7 +197,7 @@ func TestClient_ListXAttrs(t *testing.T) {
 		Path: aws.String("/data/test/core-site.xml"),
 	})
 	if err != nil {
-		t.Fatalf("webhdfs GetXAttrs failed: %s", err)
+		t.Fatalf("webhdfs ListXAttrs failed: %s", err)
 	}
 	defer resp.Body.Close()
 	t.Logf("XAttrNames: %v", resp.XAttrNames)
@@ -210,7 +210,17 @@ func TestClient_CheckAccess(t *testing.T) {
 		Fsaction: aws.String("[r-][w-][x-]"),
 	})
 	if err != nil {
-		t.Fatalf("webhdfs GetXAttrs failed: %s", err)
+		t.Fatalf("webhdfs CheckAccess failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("ContentLength: %v", aws.Int64Value(resp.ContentLength))
+	// client_test.go:203: XAttrNames: {[]}
+}
+
+func TestClient_GetAllStoragePolicy(t *testing.T) {
+	resp, err := getClient(t).GetAllStoragePolicy(&webhdfs.GetAllStoragePolicyRequest{})
+	if err != nil {
+		t.Fatalf("webhdfs GetAllStoragePolicy failed: %s", err)
 	}
 	defer resp.Body.Close()
 	t.Logf("ContentLength: %v", aws.Int64Value(resp.ContentLength))

@@ -128,3 +128,18 @@ type FileChecksum struct {
 	Bytes     string `json:"bytes" validate:"required"`     // The byte sequence of the checksum in hexadecimal.
 	Length    int    `json:"length" validate:"required"`    // The length of the bytes (not the length of the string).
 }
+
+// See：https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#BlockStoragePolicies_JSON_Schema
+type BlockStoragePolicies struct {
+	BlockStoragePolicies []BlockStoragePolicyProperties `json:"BlockStoragePolicy" validate:"required"` // An array of BlockStoragePolicy.
+}
+
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#BlockStoragePolicy_Properties
+type BlockStoragePolicyProperties struct {
+	Id                   int      `json:"id" validate:"required"`                   // Policy ID.
+	Name                 string   `json:"name" validate:"required"`                 // Policy Name.
+	StorageTypes         []string `json:"storageTypes" validate:"required"`         // An array of storage types for block placement.
+	ReplicationFallbacks []string `json:"replicationFallbacks" validate:"required"` // An array of fallback storage types for replication.
+	CreationFallbacks    []string `json:"creationFallbacks" validate:"required"`    // An array of fallback storage types for file creation.
+	CopyOnCreate         bool     `json:"copyOnCreateFile" validate:"required"`     // If set then the policy cannot be changed after file creation.
+}
