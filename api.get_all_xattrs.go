@@ -38,8 +38,8 @@ func (req *GetAllXAttrsRequest) RawPath() string {
 func (req *GetAllXAttrsRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpGetAllXAttrs)
-	if req.Encoding != nil && req.Encoding.Registered() {
-		v.Set(HttpQueryParamKeyXAttrValueEncoding, req.Encoding.String())
+	if req.Encoding != nil {
+		v.Set(HttpQueryParamKeyXAttrValueEncoding, aws.StringValue((*string)(req.Encoding)))
 	}
 	return v.Encode()
 }
@@ -70,8 +70,8 @@ func (c *Client) GetAllXAttrs(req *GetAllXAttrsRequest) (*GetAllXAttrsResponse, 
 	if err != nil {
 		return nil, err
 	}
-	if req.Encoding != nil && !req.Encoding.Registered() {
-		return nil, fmt.Errorf("unknown param %s : %s", HttpQueryParamKeyXAttrValueEncoding, req.Encoding)
+	if req.Encoding != nil {
+		return nil, fmt.Errorf("unknown param %s : %s", HttpQueryParamKeyXAttrValueEncoding, aws.StringValue((*string)(req.Encoding)))
 	}
 
 	nameNodes := c.opts.Addresses

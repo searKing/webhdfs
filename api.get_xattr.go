@@ -18,6 +18,13 @@ type GetXAttrRequest struct {
 	// Path is a required field
 	Path *string `validate:"required"`
 
+	// XAttr 			Name
+	// Name				xattr.name
+	// Description		The XAttr name of a file/directory.
+	// Type				String
+	// Default Value	<empty>
+	// Valid Values		Any string prefixed with user./trusted./system./security..
+	// Syntax			Any string prefixed with user./trusted./system./security..
 	XAttrName *string `validate:"required"`
 
 	// Encode values after retrieving them.
@@ -43,8 +50,8 @@ func (req *GetXAttrRequest) RawQuery() string {
 	if req.XAttrName != nil {
 		v.Set(HttpQueryParamKeyXAttrName, aws.StringValue(req.XAttrName))
 	}
-	if req.Encoding != nil && req.Encoding.Registered() {
-		v.Set(HttpQueryParamKeyXAttrValueEncoding, req.Encoding.String())
+	if req.Encoding != nil {
+		v.Set(HttpQueryParamKeyXAttrValueEncoding, aws.StringValue((*string)(req.Encoding)))
 	}
 	return v.Encode()
 }
@@ -75,8 +82,8 @@ func (c *Client) GetXAttr(req *GetXAttrRequest) (*GetXAttrResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	if req.Encoding != nil && !req.Encoding.Registered() {
-		return nil, fmt.Errorf("unknown param %s : %s", HttpQueryParamKeyXAttrValueEncoding, req.Encoding)
+	if req.Encoding != nil {
+		return nil, fmt.Errorf("unknown param %s : %s", HttpQueryParamKeyXAttrValueEncoding, aws.StringValue((*string)(req.Encoding)))
 	}
 
 	nameNodes := c.opts.Addresses

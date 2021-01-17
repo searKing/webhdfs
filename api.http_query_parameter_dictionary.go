@@ -56,24 +56,32 @@ const (
 // XAttr set flag
 // The XAttr set flag.
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#XAttr_set_flag
-//go:generate go-enum -type XAttrSetFlag  --linecomment
-type XAttrSetFlag int
+type XAttrSetFlag string
 
 const (
-	XAttrSetFlagCreate  XAttrSetFlag = iota // "CREATE"
-	XAttrSetFlagReplace XAttrSetFlag = iota // "REPLACE"
+	XAttrSetFlagCreate  XAttrSetFlag = "CREATE"
+	XAttrSetFlagReplace XAttrSetFlag = "REPLACE"
 )
+
+func (f XAttrSetFlag) New() *XAttrSetFlag {
+	var c = f
+	return &c
+}
 
 // The XAttr value encoding.
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#XAttr_value_encoding
-//go:generate go-enum -type XAttrValueEncoding  --linecomment
-type XAttrValueEncoding int
+type XAttrValueEncoding string
 
 const (
-	XAttrValueEncodingText   XAttrValueEncoding = iota // text
-	XAttrValueEncodingHex    XAttrValueEncoding = iota // hex
-	XAttrValueEncodingBase64 XAttrValueEncoding = iota // base64
+	XAttrValueEncodingText   XAttrValueEncoding = "text"
+	XAttrValueEncodingHex    XAttrValueEncoding = "hex"
+	XAttrValueEncodingBase64 XAttrValueEncoding = "base64"
 )
+
+func (f XAttrValueEncoding) New() *XAttrValueEncoding {
+	var c = f
+	return &c
+}
 
 // Access Time
 // The access time of a file/directory.

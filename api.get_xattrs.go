@@ -43,8 +43,8 @@ func (req *GetXAttrsRequest) RawQuery() string {
 	for _, name := range req.XAttrNames {
 		v.Add(HttpQueryParamKeyXAttrName, name)
 	}
-	if req.Encoding != nil && req.Encoding.Registered() {
-		v.Set(HttpQueryParamKeyXAttrValueEncoding, req.Encoding.String())
+	if req.Encoding != nil {
+		v.Set(HttpQueryParamKeyXAttrValueEncoding, aws.StringValue((*string)(req.Encoding)))
 	}
 	return v.Encode()
 }
@@ -75,8 +75,8 @@ func (c *Client) GetXAttrs(req *GetXAttrsRequest) (*GetXAttrsResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	if req.Encoding != nil && !req.Encoding.Registered() {
-		return nil, fmt.Errorf("unknown param %s : %s", HttpQueryParamKeyXAttrValueEncoding, req.Encoding)
+	if req.Encoding != nil {
+		return nil, fmt.Errorf("unknown param %s : %s", HttpQueryParamKeyXAttrValueEncoding, aws.StringValue((*string)(req.Encoding)))
 	}
 
 	nameNodes := c.opts.Addresses

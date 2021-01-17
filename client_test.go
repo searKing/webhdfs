@@ -576,3 +576,19 @@ func TestClient_RenameSnapshot(t *testing.T) {
 	t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
 	// client_test.go:574: webhdfs DisallowSnapshot failed: Key: 'RenameSnapshotRequest.Oldsnapshotname' Error:Field validation for 'Oldsnapshotname' failed on the 'required' tag
 }
+
+func TestClient_SetXAttr(t *testing.T) {
+	file := "/data/test/"
+	resp, err := getClient(t).SetXAttr(&webhdfs.SetXAttrRequest{
+		Path:       aws.String(file),
+		XAttrName:  aws.String("user.name"),
+		XAttrValue: aws.String("sfdh"),
+		XAttrFlag:  webhdfs.XAttrSetFlagCreate.New(),
+	})
+	if err != nil {
+		t.Fatalf("webhdfs DisallowSnapshot failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+	// client_test.go:589: webhdfs DisallowSnapshot failed: IOException: XAttr: name already exists. The REPLACE flag must be specified. in java.io.IOException
+}
