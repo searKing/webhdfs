@@ -7,70 +7,6 @@ import (
 	"github.com/searKing/golang/go/time"
 )
 
-// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#RemoteException_JSON_Schema
-type RemoteException struct {
-	Exception     string `json:"exception" validate:"required"` // Name of the exception
-	Message       string `json:"message" validate:"required"`   // Exception message
-	JavaClassName string `json:"javaClassName,omitempty"`       // Java class name of the exception
-}
-
-// Error returns the string representation of the error.
-// Satisfies the error interface.
-func (e RemoteException) Error() string {
-	var msg strings.Builder
-	msg.WriteString(e.Exception)
-	if e.Message != "" {
-		msg.WriteString(fmt.Sprintf(": %s", e.Message))
-	}
-	if e.JavaClassName != "" {
-		msg.WriteString(fmt.Sprintf(" in %s", e.JavaClassName))
-	}
-	return msg.String()
-}
-
-// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Token_JSON_Schema
-type Token struct {
-	UrlString string `json:"urlString" validate:"required"` // A delegation token encoded as a URL safe string.
-}
-
-type FileType string
-
-const (
-	FileTypeFile FileType = "FILE"
-	Directory    FileType = "DIRECTORY"
-	Symlink      FileType = "SYMLINK"
-)
-
-// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#FileStatus_JSON_Schema
-type FileStatus struct {
-	AccessTime       time.UnixTime `json:"accessTime" validate:"required"`       // The access time.
-	BlockSize        int           `json:"blockSize" validate:"required"`        // The block size of a file.
-	ChildrenNum      int           `json:"childrenNum"`                          // The number of sub files or dirs
-	FileId           int           `json:"fileId"`                               // The file id
-	Group            string        `json:"group" validate:"required"`            // The group owner.
-	Length           int           `json:"length" validate:"required"`           // The number of bytes in a file. in bytes, zero for directories
-	ModificationTime time.UnixTime `json:"modificationTime" validate:"required"` // The modification time.
-	Owner            string        `json:"owner" validate:"required"`            // The user who is the owner.
-	PathSuffix       string        `json:"pathSuffix" validate:"required"`       // The path suffix.
-	Permission       string        `json:"permission" validate:"required"`       // The permission represented as a octal string.
-	Replication      int           `json:"replication" validate:"required"`      // The number of replication of a file.
-	Symlink          string        `json:"symlink"`                              // The link target of a symlink.
-	Type             FileType      `json:"type" validate:"required"`             // The type of the path object. ["FILE", "DIRECTORY", "SYMLINK"]
-}
-
-// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#FileStatuses_JSON_Schema
-type FileStatuses struct {
-	FileStatuses []FileStatus `json:"FileStatus"` // An array of FileStatus
-}
-
-// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#DirectoryListing_JSON_Schema
-type DirectoryListing struct {
-	PartialListing struct {
-		FileStatuses FileStatuses `json:"FileStatuses"` // An array of FileStatus
-	} `json:"partialListing" validate:"required"`                      // A partial directory listing
-	RemainingEntries int `json:"remainingEntries" validate:"required"` // Number of remaining entries
-}
-
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#XAttrs_JSON_Schema
 type XAttrs struct {
 	XAttrs []XAttr `json:"XAttrs"` // XAttr array.
@@ -128,6 +64,86 @@ type FileChecksum struct {
 	Length    int    `json:"length" validate:"required"`    // The length of the bytes (not the length of the string).
 }
 
+type FileType string
+
+const (
+	FileTypeFile FileType = "FILE"
+	Directory    FileType = "DIRECTORY"
+	Symlink      FileType = "SYMLINK"
+)
+
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#FileStatus_JSON_Schema
+type FileStatus FileStatusProperties
+
+//type FileStatus struct {
+//	FileStatus FileStatusProperties `json:"FileStatus" validate:"required"` // See FileStatus Properties.
+//}
+
+// JavaScript syntax is used to define fileStatusProperties so that it can be referred in both FileStatus and FileStatuses JSON schemas.
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#FileStatus_Properties
+type FileStatusProperties struct {
+	AccessTime       time.UnixTimeMillisecond `json:"accessTime" validate:"required"`       // The access time.
+	BlockSize        int           `json:"blockSize" validate:"required"`        // The block size of a file.
+	ChildrenNum      int           `json:"childrenNum"`                          // The number of sub files or dirs
+	FileId           int           `json:"fileId"`                               // The file id
+	Group            string        `json:"group" validate:"required"`            // The group owner.
+	Length           int           `json:"length" validate:"required"`           // The number of bytes in a file. in bytes, zero for directories
+	ModificationTime time.UnixTimeMillisecond `json:"modificationTime" validate:"required"` // The modification time.
+	Owner            string        `json:"owner" validate:"required"`            // The user who is the owner.
+	PathSuffix       string        `json:"pathSuffix" validate:"required"`       // The path suffix.
+	Permission       string        `json:"permission" validate:"required"`       // The permission represented as a octal string.
+	Replication      int           `json:"replication" validate:"required"`      // The number of replication of a file.
+	Symlink          string        `json:"symlink"`                              // The link target of a symlink.
+	Type             FileType      `json:"type" validate:"required"`             // The type of the path object. ["FILE", "DIRECTORY", "SYMLINK"]
+}
+
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#FileStatuses_JSON_Schema
+type FileStatuses struct {
+	FileStatus []FileStatus `json:"FileStatus"` // An array of FileStatus
+}
+
+// A DirectoryListing JSON object represents a batch of directory entries while iteratively listing a directory.
+// It contains a FileStatuses JSON object as well as iteration information.
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#DirectoryListing_JSON_Schema
+type DirectoryListing struct {
+	PartialListing struct {
+		FileStatuses FileStatuses `json:"FileStatuses"` // An array of FileStatus
+	} `json:"partialListing" validate:"required"`                      // A partial directory listing
+	RemainingEntries int `json:"remainingEntries" validate:"required"` // Number of remaining entries
+}
+
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Long_JSON_Schema
+type Long int64 // A long integer value
+
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Path_JSON_Schema
+type Path string // The string representation a Path.
+
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#RemoteException_JSON_Schema
+type RemoteException struct {
+	Exception     string `json:"exception" validate:"required"` // Name of the exception
+	Message       string `json:"message" validate:"required"`   // Exception message
+	JavaClassName string `json:"javaClassName,omitempty"`       // Java class name of the exception
+}
+
+// Error returns the string representation of the error.
+// Satisfies the error interface.
+func (e RemoteException) Error() string {
+	var msg strings.Builder
+	msg.WriteString(e.Exception)
+	if e.Message != "" {
+		msg.WriteString(fmt.Sprintf(": %s", e.Message))
+	}
+	if e.JavaClassName != "" {
+		msg.WriteString(fmt.Sprintf(" in %s", e.JavaClassName))
+	}
+	return msg.String()
+}
+
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Token_JSON_Schema
+type Token struct {
+	UrlString string `json:"urlString" validate:"required"` // A delegation token encoded as a URL safe string.
+}
+
 // See：https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#BlockStoragePolicies_JSON_Schema
 type BlockStoragePolicies struct {
 	BlockStoragePolicies []BlockStoragePolicyProperties `json:"BlockStoragePolicy" validate:"required"` // An array of BlockStoragePolicy.
@@ -170,4 +186,47 @@ const (
 	DiffReportEntryTypeModify DiffReportEntryType = "MODIFY"
 	DiffReportEntryTypeDelete DiffReportEntryType = "DELETE"
 	DiffReportEntryTypeRename DiffReportEntryType = "RENAME"
+)
+
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#SnapshottableDirectoryList_JSON_Schema
+type SnapshottableDirectoryList struct {
+	SnapshottableDirectoryList []SnapshottableDirectoryStatus `json:"SnapshottableDirectoryList" validate:"required"` // An array of SnapshottableDirectoryStatus
+}
+
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#SnapshottableDirectoryStatus
+type SnapshottableDirectoryStatus struct {
+	DirStatus      FileStatusProperties `json:"dirStatus"`                          // Source path name relative to snapshot root.
+	ParentFullPath string               `json:"parentFullPath" validate:"required"` // Full path of the parent of snapshottable directory.
+	SnapshotNumber int                  `json:"snapshotNumber" validate:"required"` // Number of snapshots created on the snapshottable directory.
+	SnapshotQuota  int                  `json:"snapshotQuota" validate:"required"`  // Total number of snapshots allowed on the snapshottable directory.
+}
+
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#BlockLocations_JSON_Schema
+type BlockLocations struct {
+}
+
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#BlockLocation_JSON_Schema
+type BlockLocation struct {
+}
+
+// JavaScript syntax is used to define blockLocationProperties so that it can be referred in both BlockLocation and BlockLocations JSON schemas.
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#BlockLocation_Properties
+type BlockLocationProperties struct {
+	CachedHosts   []string      `json:"cachedHosts" validate:"required"`   // Datanode hostnames with a cached replica
+	Corrupt       bool          `json:"corrupt" validate:"required"`       // True if the block is corrupted
+	Hosts         []string      `json:"hosts" validate:"required"`         // Datanode hostnames store the block
+	Length        int           `json:"length" validate:"required"`        // Length of the block
+	Names         []string      `json:"names" validate:"required"`         // Datanode IP:xferPort for accessing the block
+	Offset        int           `json:"offset" validate:"required"`        // Offset of the block in the file
+	StorageTypes  []StorageType `json:"storageTypes" validate:"required"`  // Storage type of each replica, ["RAM_DISK", "SSD", "DISK", "ARCHIVE"]
+	TopologyPaths []string      `json:"topologyPaths" validate:"required"` // Datanode addresses in network topology, [ /rack/host:ip ]
+}
+
+type StorageType string
+
+const (
+	StorageTypeRamDisk StorageType = "RAM_DISK"
+	StorageTypeSsd     StorageType = "SSD"
+	StorageTypeDisk    StorageType = "DISK"
+	StorageTypeArchive StorageType = "ARCHIVE"
 )

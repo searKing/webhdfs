@@ -60,8 +60,8 @@ func TestClient_GetFileStatus(t *testing.T) {
 	}
 	defer resp.Body.Close()
 	t.Logf("ContentType: %v", resp.FileStatus)
-	t.Logf("AccessTime: %s", resp.FileStatus.AccessTime.Time().String())
-	t.Logf("ModificationTime: %s", resp.FileStatus.ModificationTime.Time().String())
+	t.Logf("AccessTime: %s", resp.FileStatus.AccessTime.Time.String())
+	t.Logf("ModificationTime: %s", resp.FileStatus.ModificationTime.Time.String())
 	t.Logf("Type: %s", resp.FileStatus.Type)
 	//    client_test.go:62: FileStatus: {1610695991369 134217728 0 17458 supergroup 3659 1610605959024 hdfs  644 1  FILE}
 	//    client_test.go:63: AccessTime: 53010-12-05 01:09:29 +0800 CST
@@ -90,6 +90,7 @@ func TestClient_ListStatusBatch(t *testing.T) {
 	}
 	defer resp.Body.Close()
 	t.Logf("DirectoryListing: %v", resp.DirectoryListing)
+	// client_test.go:89: webhdfs ListStatusBatch failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.GetOpParam.Op.LISTSTATUS_BATCH in java.lang.IllegalArgumentException
 }
 
 func TestClient_GetContentSummary(t *testing.T) {
@@ -113,6 +114,7 @@ func TestClient_GetQuotaUsage(t *testing.T) {
 	}
 	defer resp.Body.Close()
 	t.Logf("QuotaUsage: %v", resp.QuotaUsage)
+	// client_test.go:113: webhdfs GetQuotaUsage failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.GetOpParam.Op.GETQUOTAUSAGE in java.lang.IllegalArgumentException
 }
 
 func TestClient_GetFileChecksum(t *testing.T) {
@@ -148,7 +150,7 @@ func TestClient_GetTrashRoot(t *testing.T) {
 	}
 	defer resp.Body.Close()
 	t.Logf("Path: %v", resp.Path)
-	// client_test.go:138: Path: /user/hdfs
+	// client_test.go:149: webhdfs GetTrashRoot failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.GetOpParam.Op.GETTRASHROOT in java.lang.IllegalArgumentException
 }
 
 func TestClient_GetXAttr(t *testing.T) {
@@ -214,7 +216,7 @@ func TestClient_CheckAccess(t *testing.T) {
 	}
 	defer resp.Body.Close()
 	t.Logf("ContentLength: %v", aws.Int64Value(resp.ContentLength))
-	// client_test.go:203: XAttrNames: {[]}
+	// client_test.go:218: ContentLength: 0
 }
 
 func TestClient_GetAllStoragePolicy(t *testing.T) {
@@ -248,4 +250,16 @@ func TestClient_GetSnapshotDiff(t *testing.T) {
 	defer resp.Body.Close()
 	t.Logf("SnapshotDiffReport: %v", resp.SnapshotDiffReport)
 	// client_test.go:247: webhdfs GetAllStoragePolicy failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.GetOpParam.Op.GETSNAPSHOTDIFF in java.lang.IllegalArgumentException
+}
+
+func TestClient_GetSnapshottableDirectoryList(t *testing.T) {
+	resp, err := getClient(t).GetSnapshottableDirectoryList(&webhdfs.GetSnapshottableDirectoryListRequest{
+		Username: aws.String("hdfs"),
+	})
+	if err != nil {
+		t.Fatalf("webhdfs GetAllStoragePolicy failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("SnapshottableDirectoryList: %v", resp.SnapshottableDirectoryList)
+	// client_test.go:258: webhdfs GetAllStoragePolicy failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.GetOpParam.Op.GETSNAPSHOTTABLEDIRECTORYLIST in java.lang.IllegalArgumentException
 }
