@@ -12,7 +12,12 @@ import (
 	"github.com/searKing/golang/go/errors"
 )
 
-type EnableECPolicyRequest struct {
+type SetECPolicyRequest struct {
+	// Path of the object to get.
+	//
+	// Path is a required field
+	Path *string `validate:"required"`
+
 	// Name				ecpolicy, Erasure Coding Policy
 	// Description		The name of the erasure coding policy.
 	// Type				String
@@ -22,25 +27,25 @@ type EnableECPolicyRequest struct {
 	ECPolicy *string `validate:"required"`
 }
 
-type EnableECPolicyResponse struct {
+type SetECPolicyResponse struct {
 	NameNode string `json:"-"`
 	ErrorResponse
 	HttpResponse `json:"-"`
 }
 
-func (req *EnableECPolicyRequest) RawPath() string {
-	return ""
+func (req *SetECPolicyRequest) RawPath() string {
+	return aws.StringValue(req.Path)
 }
-func (req *EnableECPolicyRequest) RawQuery() string {
+func (req *SetECPolicyRequest) RawQuery() string {
 	v := url.Values{}
-	v.Set("op", OpEnableECPolicy)
+	v.Set("op", OpSetECPolicy)
 	if req.ECPolicy != nil {
 		v.Set("ecpolicy", aws.StringValue(req.ECPolicy))
 	}
 	return v.Encode()
 }
 
-func (resp *EnableECPolicyResponse) UnmarshalHTTP(httpResp *http.Response) error {
+func (resp *SetECPolicyResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	resp.HttpResponse.UnmarshalHTTP(httpResp)
 	defer resp.Body.Close()
 	if isSuccessHttpCode(httpResp.StatusCode) {
@@ -62,9 +67,9 @@ func (resp *EnableECPolicyResponse) UnmarshalHTTP(httpResp *http.Response) error
 	return nil
 }
 
-// Enable EC Policy
-// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Enable_EC_Policy
-func (c *Client) EnableECPolicy(req *EnableECPolicyRequest) (*EnableECPolicyResponse, error) {
+// Set EC Policy
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Set_EC_Policy
+func (c *Client) SetECPolicy(req *SetECPolicyRequest) (*SetECPolicyResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -91,7 +96,7 @@ func (c *Client) EnableECPolicy(req *EnableECPolicyRequest) (*EnableECPolicyResp
 			continue
 		}
 
-		var resp EnableECPolicyResponse
+		var resp SetECPolicyResponse
 		resp.NameNode = addr
 
 		if err := resp.UnmarshalHTTP(httpResp); err != nil {

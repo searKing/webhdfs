@@ -62,8 +62,8 @@ func (resp *DisableECPolicyResponse) UnmarshalHTTP(httpResp *http.Response) erro
 	return nil
 }
 
-// Set Storage Policy
-// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Set_Storage_Policy
+// Disable EC Policy
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Disable_EC_Policy
 func (c *Client) DisableECPolicy(req *DisableECPolicyRequest) (*DisableECPolicyResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
