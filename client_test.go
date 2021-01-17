@@ -511,3 +511,16 @@ func TestClient_RenewDelegationToken(t *testing.T) {
 	t.Logf("Long: %d", resp.Long)
 	// client_test.go:511: Long: 1610975228598
 }
+
+func TestClient_CancelDelegationToken(t *testing.T) {
+	token := "HAAEaGRmcwRoZGZzAIoBdxB0SHCKAXc0gMxwMgcUR3A39bW0mraYQRzjjs3X3mH7fdkSV0VCSERGUyBkZWxlZ2F0aW9uDzE3Mi4xNy4wLjI6ODAyMA"
+	resp, err := getClient(t).CancelDelegationToken(&webhdfs.CancelDelegationTokenRequest{
+		Token: aws.String(token),
+	})
+	if err != nil {
+		t.Fatalf("webhdfs Open failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+	// client_test.go:521: webhdfs Open failed: InvalidToken: Token not found in org.apache.hadoop.security.token.SecretManager$InvalidToken
+}
