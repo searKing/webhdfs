@@ -24,7 +24,7 @@ const (
 	OpGetSnapshotDiff               = "GETSNAPSHOTDIFF"
 	OpGetSnapshottableDirectoryList = "GETSNAPSHOTTABLEDIRECTORYLIST"
 	OpGetFileBlockLocations         = "GETFILEBLOCKLOCATIONS"
-	OpGetPolicy                     = "GETECPOLICY"
+	OpGetECPolicy                   = "GETECPOLICY"
 	OpCreate                        = "CREATE"
 	OpMkDirs                        = "MKDIRS"
 	OpCreateSymlink                 = "CREATESYMLINK"

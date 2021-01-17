@@ -275,3 +275,15 @@ func TestClient_GetFileBlockLocations(t *testing.T) {
 	t.Logf("BlockLocations: %v", resp.BlockLocations)
 	// client_test.go:273: webhdfs GetAllStoragePolicy failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.GetOpParam.Op.GETFILEBLOCKLOCATIONS in java.lang.IllegalArgumentException
 }
+
+func TestClient_GetECPolicy(t *testing.T) {
+	resp, err := getClient(t).GetECPolicy(&webhdfs.GetECPolicyRequest{
+		Path: aws.String("/data/test/core-site.xml"),
+	})
+	if err != nil {
+		t.Fatalf("webhdfs GetFileBlockLocations failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("ECPolicy: %v", resp.ECPolicy)
+	// client_test.go:285: webhdfs GetFileBlockLocations failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.GetOpParam.Op.GETECPOLICY in java.lang.IllegalArgumentException
+}

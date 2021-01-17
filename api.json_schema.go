@@ -144,6 +144,26 @@ type Token struct {
 	UrlString string `json:"urlString" validate:"required"` // A delegation token encoded as a URL safe string.
 }
 
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#ECPolicy_JSON_Schema
+type ECPolicy struct {
+	Name              string         `json:"name"`
+	Schema            ECPolicySchema `json:"schema"`
+	CellSize          int            `json:"cellSize"`
+	Id                int            `json:"id"`
+	Codecname         string         `json:"codecname"`
+	NumDataUnits      int            `json:"numDataUnits"`
+	NumParityUnits    int            `json:"numParityUnits"`
+	Replicationpolicy bool           `json:"replicationpolicy"`
+	SystemPolicy      bool           `json:"systemPolicy"`
+}
+
+type ECPolicySchema struct {
+	CodecName      string      `json:"codecName"`
+	NumDataUnits   int         `json:"numDataUnits"`
+	NumParityUnits int         `json:"numParityUnits"`
+	ExtraOptions   interface{} `json:"extraOptions"`
+}
+
 // See：https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#BlockStoragePolicies_JSON_Schema
 type BlockStoragePolicies struct {
 	BlockStoragePolicies []BlockStoragePolicyProperties `json:"BlockStoragePolicy" validate:"required"` // An array of BlockStoragePolicy.
