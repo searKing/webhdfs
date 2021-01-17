@@ -26,7 +26,7 @@ const (
 	OpGetFileBlockLocations         = "GETFILEBLOCKLOCATIONS"
 	OpGetECPolicy                   = "GETECPOLICY"
 	OpCreate                        = "CREATE"
-	OpMkDirs                        = "MKDIRS"
+	OpMkdirs                        = "MKDIRS"
 	OpCreateSymlink                 = "CREATESYMLINK"
 	OpRename                        = "RENAME"
 	OpSetReplication                = "SETREPLICATION"

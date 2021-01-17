@@ -36,6 +36,7 @@ func (req *GetQuotaUsageRequest) RawQuery() string {
 
 func (resp *GetQuotaUsageResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	resp.HttpResponse.UnmarshalHTTP(httpResp)
+	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

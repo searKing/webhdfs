@@ -115,8 +115,10 @@ func (resp *CreateResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	return nil
 }
 
-// Create and Read a File
-// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Create_and_Read_a_File
+// Create and Write to a File
+// If no permissions are specified, the newly created file will be assigned with default 644 permission.
+// No umask mode will be applied from server side (so “fs.permissions.umask-mode” value configuration set on Namenode side will have no effect).
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Create_and_Write_to_a_File
 func (c *Client) Create(req *CreateRequest) (*CreateResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {

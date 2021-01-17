@@ -59,7 +59,7 @@ func TestClient_GetFileStatus(t *testing.T) {
 		t.Fatalf("webhdfs GetFileStatus failed: %s", err)
 	}
 	defer resp.Body.Close()
-	t.Logf("ContentType: %v", resp.FileStatus)
+	t.Logf("FileStatus: %v", resp.FileStatus)
 	t.Logf("AccessTime: %s", resp.FileStatus.AccessTime.Time.String())
 	t.Logf("ModificationTime: %s", resp.FileStatus.ModificationTime.Time.String())
 	t.Logf("Type: %s", resp.FileStatus.Type)
@@ -317,4 +317,39 @@ func TestClient_Create(t *testing.T) {
 	// client_test.go:302: ContentLength: 0
 	// client_test.go:313: ContentType: application/octet-stream
 	// client_test.go:314: ContentLength: 0
+}
+
+func TestClient_Mkdirs(t *testing.T) {
+	dir := "/data/test/create"
+	{
+		resp, err := getClient(t).Mkdirs(&webhdfs.MkdirsRequest{
+			Path: aws.String(dir),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Open failed: %s", err)
+		}
+		defer resp.Body.Close()
+		t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
+		t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+	}
+
+	{
+		resp, err := getClient(t).GetFileStatus(&webhdfs.GetFileStatusRequest{
+			Path: aws.String(dir),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Open failed: %s", err)
+		}
+		defer resp.Body.Close()
+		t.Logf("FileStatus: %v", resp.FileStatus)
+		t.Logf("AccessTime: %s", resp.FileStatus.AccessTime.Time.String())
+		t.Logf("ModificationTime: %s", resp.FileStatus.ModificationTime.Time.String())
+		t.Logf("Type: %s", resp.FileStatus.Type)
+	}
+	// client_test.go:332: ContentType: application/json
+	// client_test.go:333: ContentLength: 16
+	// client_test.go:344: FileStatus: {0 0 0 18823 supergroup 0 -1307645760304418816 hdfs  755 0  DIRECTORY}
+	// client_test.go:345: AccessTime: 1970-01-01 08:00:00 +0800 CST
+	// client_test.go:346: ModificationTime: 2021-01-17 18:24:25.335 +0800 CST
+	// client_test.go:347: Type: DIRECTORY
 }

@@ -36,6 +36,7 @@ func (req *GetHomeDirectoryRequest) RawQuery() string {
 
 func (resp *GetHomeDirectoryResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	resp.HttpResponse.UnmarshalHTTP(httpResp)
+	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

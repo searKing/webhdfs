@@ -23,9 +23,7 @@ type XAttrNames struct {
 }
 
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Boolean_JSON_Schema
-type Boolean struct {
-	Boolean bool `json:"boolean" validate:"required"` // A boolean value.
-}
+type Boolean = bool // A boolean value.
 
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#ContentSummary_JSON_Schema
 type ContentSummary struct {
