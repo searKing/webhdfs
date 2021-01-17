@@ -836,7 +836,7 @@ func TestClient_UnsetStoragePolicy(t *testing.T) {
 		}
 		defer resp.Body.Close()
 	}
-	// client_test.go:836: webhdfs Create failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PostOpParam.Op.UNSETSTORAGEPOLICY in java.lang.IllegalArgumentException
+	// client_test.go:836: webhdfs UnsetStoragePolicy failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PostOpParam.Op.UNSETSTORAGEPOLICY in java.lang.IllegalArgumentException
 }
 
 func TestClient_UnsetECPolicy(t *testing.T) {
@@ -850,7 +850,7 @@ func TestClient_UnsetECPolicy(t *testing.T) {
 		}
 		defer resp.Body.Close()
 	}
-	// client_test.go:850: webhdfs Create failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PostOpParam.Op.UNSETECPOLICY in java.lang.IllegalArgumentException
+	// client_test.go:850: webhdfs UnsetECPolicy failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PostOpParam.Op.UNSETECPOLICY in java.lang.IllegalArgumentException
 }
 
 func TestClient_Delete(t *testing.T) {
@@ -864,5 +864,20 @@ func TestClient_Delete(t *testing.T) {
 		}
 		defer resp.Body.Close()
 	}
-	// client_test.go:850: webhdfs Create failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PostOpParam.Op.UNSETECPOLICY in java.lang.IllegalArgumentException
+	// client_test.go:850: webhdfs Delete failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PostOpParam.Op.UNSETECPOLICY in java.lang.IllegalArgumentException
+}
+
+func TestClient_DeleteSnapshot(t *testing.T) {
+	file := "/data/test/test.txt"
+	{
+		resp, err := getClient(t).DeleteSnapshot(&webhdfs.DeleteSnapshotRequest{
+			Path:         aws.String(file),
+			Snapshotname: aws.String("snapshot"),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs DeleteSnapshot failed: %s", err)
+		}
+		defer resp.Body.Close()
+	}
+	// client_test.go:878: webhdfs DeleteSnapshot failed: FileNotFoundException: Directory does not exist: /data/test/test.txt in java.io.FileNotFoundException
 }
