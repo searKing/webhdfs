@@ -606,3 +606,15 @@ func TestClient_RemoveXAttr(t *testing.T) {
 	t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
 	// client_test.go:606: ContentLength: 0
 }
+
+func TestClient_SetStoragePolicy(t *testing.T) {
+	resp, err := getClient(t).SetStoragePolicy(&webhdfs.SetStoragePolicyRequest{
+		StoragePolicy: aws.String("policy"),
+	})
+	if err != nil {
+		t.Fatalf("webhdfs RemoveXAttr failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+	// client_test.go:615: webhdfs RemoveXAttr failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PutOpParam.Op.SETSTORAGEPOLICY in java.lang.IllegalArgumentException
+}
