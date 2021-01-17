@@ -3,6 +3,7 @@ package webhdfs
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -16,6 +17,9 @@ type CreateRequest struct {
 	//
 	// Path is a required field
 	Path *string `validate:"required"`
+
+	// Object data.
+	Body io.Reader
 
 	// Name				overwrite
 	// Description		If a file already exists, should it be overwritten?
@@ -135,7 +139,7 @@ func (c *Client) Create(req *CreateRequest) (*CreateResponse, error) {
 	for _, addr := range nameNodes {
 		u.Host = addr
 
-		req, err := http.NewRequest(http.MethodPut, u.String(), nil)
+		req, err := http.NewRequest(http.MethodPut, u.String(), req.Body)
 		if err != nil {
 			return nil, err
 		}

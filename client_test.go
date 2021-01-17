@@ -1,6 +1,8 @@
 package webhdfs_test
 
 import (
+	"io/ioutil"
+	"strings"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -289,10 +291,11 @@ func TestClient_GetECPolicy(t *testing.T) {
 }
 
 func TestClient_Create(t *testing.T) {
-	file := "/data/test/create.txt"
+	file := "/data/test/create.txt2222"
 	{
 		resp, err := getClient(t).Create(&webhdfs.CreateRequest{
 			Path: aws.String(file),
+			Body: strings.NewReader("测试输入"),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Open failed: %s", err)
@@ -312,11 +315,19 @@ func TestClient_Create(t *testing.T) {
 		defer resp.Body.Close()
 		t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
 		t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+
+		content, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatalf("webhdfs Read failed: %s", err)
+		}
+		t.Logf("content: %s", string(content))
+
 	}
 	// client_test.go:301: ContentType:
 	// client_test.go:302: ContentLength: 0
 	// client_test.go:313: ContentType: application/octet-stream
 	// client_test.go:314: ContentLength: 0
+	// client_test.go:323: content: 测试输入
 }
 
 func TestClient_Mkdirs(t *testing.T) {
