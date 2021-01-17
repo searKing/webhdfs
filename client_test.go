@@ -646,3 +646,15 @@ func TestClient_EnableECPolicy(t *testing.T) {
 	t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
 	// client_test.go:644: webhdfs EnableECPolicy failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PutOpParam.Op.ENABLEECPOLICY in java.lang.IllegalArgumentException
 }
+
+func TestClient_DisableECPolicy(t *testing.T) {
+	resp, err := getClient(t).DisableECPolicy(&webhdfs.DisableECPolicyRequest{
+		ECPolicy: aws.String("ecpolicy"),
+	})
+	if err != nil {
+		t.Fatalf("webhdfs DisableECPolicy failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+	// client_test.go:655: webhdfs DisableECPolicy failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PutOpParam.Op.DISABLEECPOLICY in java.lang.IllegalArgumentException
+}
