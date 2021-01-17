@@ -726,3 +726,57 @@ func TestClient_Append(t *testing.T) {
 	// client_test.go:712: ContentLength: 66
 	// client_test.go:718: content: createappend
 }
+
+func TestClient_Concat(t *testing.T) {
+	file := "/data/test/append.txt"
+	{
+		resp, err := getClient(t).Create(&webhdfs.CreateRequest{
+			Path: aws.String("/data/test/1.txt"),
+			Body: strings.NewReader("create"),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Create failed: %s", err)
+		}
+		defer resp.Body.Close()
+	}
+	{
+		resp, err := getClient(t).Create(&webhdfs.CreateRequest{
+			Path: aws.String("/data/test/2.txt"),
+			Body: strings.NewReader("create"),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Create failed: %s", err)
+		}
+		defer resp.Body.Close()
+	}
+	{
+		resp, err := getClient(t).Concat(&webhdfs.ConcatRequest{
+			Path:    aws.String(file),
+			Sources: aws.String("/data/test/11.txt,/data/test/22.txt"),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Concat failed: %s", err)
+		}
+		defer resp.Body.Close()
+		t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
+		t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+	}
+
+	{
+		resp, err := getClient(t).Open(&webhdfs.OpenRequest{
+			Path: aws.String(file),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Open failed: %s", err)
+		}
+		defer resp.Body.Close()
+
+		content, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatalf("webhdfs Read failed: %s", err)
+		}
+		t.Logf("content: %s", string(content))
+
+	}
+	// client_test.go:758: webhdfs Concat failed: HadoopIllegalArgumentException: The last block in /data/test/append.txt is not full; last block size = 66 but file block size = 134217728 in org.apache.hadoop.HadoopIllegalArgumentException
+}
