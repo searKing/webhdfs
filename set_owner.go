@@ -8,6 +8,7 @@ import (
 	"net/url"
 
 	"github.com/aws/aws-sdk-go/aws"
+
 	"github.com/searKing/golang/go/errors"
 )
 
@@ -72,8 +73,8 @@ func (resp *SetOwnerResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	return nil
 }
 
-// Replication
-// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Replication
+// Set Owner
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Set_Owner
 func (c *Client) SetOwner(req *SetOwnerRequest) (*SetOwnerResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {

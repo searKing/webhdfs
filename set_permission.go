@@ -12,41 +12,51 @@ import (
 	"github.com/searKing/golang/go/errors"
 )
 
-type MkdirsRequest struct {
+type SetPermissionRequest struct {
 	// Path of the object to get.
 	//
 	// Path is a required field
 	Path *string `validate:"required"`
 
-	// Name	permission
-	// Description		The permission of a file/directory.
-	// Type	Octal
-	// Default Value	644 for files, 755 for directories
-	// Valid Values		0 - 1777
-	// Syntax			Any radix-8 integer (leading zeros may be omitted.)
-	Permission *int
+	// Name				owner
+	// Description		The username who is the owner of a file/directory.
+	// Type				String
+	// Default Value	<empty> (means keeping it unchanged)
+	// Valid Values		Any valid username.
+	// Syntax			Any string.
+	Owner *string
+
+	// Name				group
+	// Description		The name of a group.
+	// Type				String
+	// Default Value	<empty> (means keeping it unchanged)
+	// Valid Values		Any valid group name.
+	// Syntax			Any string.
+	Group *string
 }
 
-type MkdirsResponse struct {
+type SetPermissionResponse struct {
 	NameNode string `json:"-"`
 	ErrorResponse
 	HttpResponse `json:"-"`
-	Boolean      Boolean `json:"boolean"`
 }
 
-func (req *MkdirsRequest) RawPath() string {
+func (req *SetPermissionRequest) RawPath() string {
 	return aws.StringValue(req.Path)
 }
-func (req *MkdirsRequest) RawQuery() string {
+func (req *SetPermissionRequest) RawQuery() string {
 	v := url.Values{}
-	v.Set("op", OpMkdirs)
-	if req.Permission != nil {
-		v.Set("permission", fmt.Sprintf("%#o", aws.IntValue(req.Permission)))
+	v.Set("op", OpSetPermission)
+	if req.Owner != nil {
+		v.Set("owner", aws.StringValue(req.Owner))
+	}
+	if req.Group != nil {
+		v.Set("group", aws.StringValue(req.Group))
 	}
 	return v.Encode()
 }
 
-func (resp *MkdirsResponse) UnmarshalHTTP(httpResp *http.Response) error {
+func (resp *SetPermissionResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	resp.HttpResponse.UnmarshalHTTP(httpResp)
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
@@ -63,11 +73,9 @@ func (resp *MkdirsResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	return nil
 }
 
-// Make a Directory
-// If no permissions are specified, the newly created directory will have 755 permission as default.
-// No umask mode will be applied from server side (so “fs.permissions.umask-mode” value configuration set on Namenode side will have no effect).
-// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Make_a_Directory
-func (c *Client) Mkdirs(req *MkdirsRequest) (*MkdirsResponse, error) {
+// Set Owner
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Set_Owner
+func (c *Client) SetPermission(req *SetPermissionRequest) (*SetPermissionResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -94,7 +102,7 @@ func (c *Client) Mkdirs(req *MkdirsRequest) (*MkdirsResponse, error) {
 			continue
 		}
 
-		var resp MkdirsResponse
+		var resp SetPermissionResponse
 		resp.NameNode = addr
 
 		if err := resp.UnmarshalHTTP(httpResp); err != nil {
