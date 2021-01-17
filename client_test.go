@@ -550,3 +550,16 @@ func TestClient_DisallowSnapshot(t *testing.T) {
 	t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
 	// client_test.go:547: webhdfs DisallowSnapshot failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PutOpParam.Op.DISALLOWSNAPSHOT in java.lang.IllegalArgumentException
 }
+
+func TestClient_CreateSnapshot(t *testing.T) {
+	file := "/data/test/"
+	resp, err := getClient(t).CreateSnapshot(&webhdfs.CreateSnapshotRequest{
+		Path: aws.String(file),
+	})
+	if err != nil {
+		t.Fatalf("webhdfs DisallowSnapshot failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("Path: %s", aws.StringValue(resp.Path))
+	// client_test.go:560: webhdfs DisallowSnapshot failed: SnapshotException: Directory is not a snapshottable directory: /data/test in org.apache.hadoop.hdfs.protocol.SnapshotException
+}
