@@ -614,11 +614,11 @@ func TestClient_SetStoragePolicy(t *testing.T) {
 		StoragePolicy: aws.String("policy"),
 	})
 	if err != nil {
-		t.Fatalf("webhdfs RemoveXAttr failed: %s", err)
+		t.Fatalf("webhdfs SetStoragePolicy failed: %s", err)
 	}
 	defer resp.Body.Close()
 	t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
-	// client_test.go:615: webhdfs RemoveXAttr failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PutOpParam.Op.SETSTORAGEPOLICY in java.lang.IllegalArgumentException
+	// client_test.go:615: webhdfs SetStoragePolicy failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PutOpParam.Op.SETSTORAGEPOLICY in java.lang.IllegalArgumentException
 }
 
 func TestClient_SatisfyStoragePolicy(t *testing.T) {
@@ -628,9 +628,21 @@ func TestClient_SatisfyStoragePolicy(t *testing.T) {
 		StoragePolicy: aws.String("policy"),
 	})
 	if err != nil {
-		t.Fatalf("webhdfs RemoveXAttr failed: %s", err)
+		t.Fatalf("webhdfs SatisfyStoragePolicy failed: %s", err)
 	}
 	defer resp.Body.Close()
 	t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
-	// client_test.go:631: webhdfs RemoveXAttr failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PutOpParam.Op.SATISFYSTORAGEPOLICY in java.lang.IllegalArgumentException
+	// client_test.go:631: webhdfs SatisfyStoragePolicy failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PutOpParam.Op.SATISFYSTORAGEPOLICY in java.lang.IllegalArgumentException
+}
+
+func TestClient_EnableECPolicy(t *testing.T) {
+	resp, err := getClient(t).EnableECPolicy(&webhdfs.EnableECPolicyRequest{
+		ECPolicy: aws.String("ecpolicy"),
+	})
+	if err != nil {
+		t.Fatalf("webhdfs EnableECPolicy failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+	// client_test.go:644: webhdfs EnableECPolicy failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PutOpParam.Op.ENABLEECPOLICY in java.lang.IllegalArgumentException
 }
