@@ -780,3 +780,47 @@ func TestClient_Concat(t *testing.T) {
 	}
 	// client_test.go:758: webhdfs Concat failed: HadoopIllegalArgumentException: The last block in /data/test/append.txt is not full; last block size = 66 but file block size = 134217728 in org.apache.hadoop.HadoopIllegalArgumentException
 }
+
+func TestClient_Truncate(t *testing.T) {
+	file := "/data/test/truncate.txt"
+	{
+		resp, err := getClient(t).Create(&webhdfs.CreateRequest{
+			Path: aws.String(file),
+			Body: strings.NewReader("create"),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Create failed: %s", err)
+		}
+		defer resp.Body.Close()
+	}
+	{
+		resp, err := getClient(t).Truncate(&webhdfs.TruncateRequest{
+			Path:      aws.String(file),
+			NewLength: aws.Int64(0),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Truncate failed: %s", err)
+		}
+		defer resp.Body.Close()
+		t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
+		t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+	}
+
+	{
+		resp, err := getClient(t).Open(&webhdfs.OpenRequest{
+			Path: aws.String(file),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Open failed: %s", err)
+		}
+		defer resp.Body.Close()
+
+		content, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatalf("webhdfs Read failed: %s", err)
+		}
+		t.Logf("content: %s", string(content))
+
+	}
+	//     client_test.go:801: webhdfs Truncate failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PostOpParam.Op.TRUNCATE in java.lang.IllegalArgumentException
+}
