@@ -75,6 +75,9 @@ func (resp *SetXAttrResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	if err != nil {
 		return err
 	}
+	if len(body) == 0 {
+		return nil
+	}
 	if err = json.Unmarshal(body, &resp); err != nil {
 		return err
 	}

@@ -91,6 +91,9 @@ func (resp *OpenResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	if err != nil {
 		return err
 	}
+	if len(body) == 0 {
+		return nil
+	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
 		return err
