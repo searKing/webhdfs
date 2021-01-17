@@ -563,3 +563,16 @@ func TestClient_CreateSnapshot(t *testing.T) {
 	t.Logf("Path: %s", aws.StringValue(resp.Path))
 	// client_test.go:560: webhdfs DisallowSnapshot failed: SnapshotException: Directory is not a snapshottable directory: /data/test in org.apache.hadoop.hdfs.protocol.SnapshotException
 }
+
+func TestClient_RenameSnapshot(t *testing.T) {
+	file := "/data/test/"
+	resp, err := getClient(t).RenameSnapshot(&webhdfs.RenameSnapshotRequest{
+		Path: aws.String(file),
+	})
+	if err != nil {
+		t.Fatalf("webhdfs DisallowSnapshot failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+	// client_test.go:574: webhdfs DisallowSnapshot failed: Key: 'RenameSnapshotRequest.Oldsnapshotname' Error:Field validation for 'Oldsnapshotname' failed on the 'required' tag
+}

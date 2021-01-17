@@ -12,11 +12,19 @@ import (
 	"github.com/searKing/golang/go/errors"
 )
 
-type CreateSnapshotRequest struct {
+type RenameSnapshotRequest struct {
 	// Path of the object to get.
 	//
 	// Path is a required field
 	Path *string `validate:"required"`
+	// Name				oldsnapshotname
+	// Description		The old name of the snapshot to be renamed.
+	// Type				String
+	// Default Value	null
+	// Valid Values		An existing snapshot name.
+	// Syntax			Any string.
+	// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Old_Snapshot_Name
+	Oldsnapshotname *string `json:"oldsnapshotname,omitempty" validate:"required"`
 	// Name				snapshotname
 	// Description		The name of the snapshot to be created/deleted. Or the new name for snapshot rename.
 	// Type				String
@@ -27,32 +35,33 @@ type CreateSnapshotRequest struct {
 	Snapshotname *string `json:"snapshotname,omitempty"`
 }
 
-type CreateSnapshotResponse struct {
+type RenameSnapshotResponse struct {
 	NameNode string `json:"-"`
 	ErrorResponse
 	HttpResponse `json:"-"`
-
-	// Path of the object to get.
-	//
-	// Path is a required field
-	Path *string
 }
 
-func (req *CreateSnapshotRequest) RawPath() string {
+func (req *RenameSnapshotRequest) RawPath() string {
 	return aws.StringValue(req.Path)
 }
-func (req *CreateSnapshotRequest) RawQuery() string {
+func (req *RenameSnapshotRequest) RawQuery() string {
 	v := url.Values{}
-	v.Set("op", OpCreateSnapshot)
+	v.Set("op", OpRenameSnapshot)
+	if req.Oldsnapshotname != nil {
+		v.Set("oldsnapshotname", aws.StringValue(req.Oldsnapshotname))
+	}
 	if req.Snapshotname != nil {
 		v.Set("snapshotname", aws.StringValue(req.Snapshotname))
 	}
 	return v.Encode()
 }
 
-func (resp *CreateSnapshotResponse) UnmarshalHTTP(httpResp *http.Response) error {
+func (resp *RenameSnapshotResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	resp.HttpResponse.UnmarshalHTTP(httpResp)
 	defer resp.Body.Close()
+	if isSuccessHttpCode(httpResp.StatusCode) {
+		return nil
+	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
@@ -69,7 +78,7 @@ func (resp *CreateSnapshotResponse) UnmarshalHTTP(httpResp *http.Response) error
 
 // Create Snapshot
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Create_Snapshot
-func (c *Client) CreateSnapshot(req *CreateSnapshotRequest) (*CreateSnapshotResponse, error) {
+func (c *Client) RenameSnapshot(req *RenameSnapshotRequest) (*RenameSnapshotResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -96,7 +105,7 @@ func (c *Client) CreateSnapshot(req *CreateSnapshotRequest) (*CreateSnapshotResp
 			continue
 		}
 
-		var resp CreateSnapshotResponse
+		var resp RenameSnapshotResponse
 		resp.NameNode = addr
 
 		if err := resp.UnmarshalHTTP(httpResp); err != nil {
