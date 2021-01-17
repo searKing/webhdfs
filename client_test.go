@@ -824,3 +824,17 @@ func TestClient_Truncate(t *testing.T) {
 	}
 	//     client_test.go:801: webhdfs Truncate failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PostOpParam.Op.TRUNCATE in java.lang.IllegalArgumentException
 }
+
+func TestClient_UnsetStoragePolicy(t *testing.T) {
+	file := "/data/test/test.txt"
+	{
+		resp, err := getClient(t).UnsetStoragePolicy(&webhdfs.UnsetStoragePolicyRequest{
+			Path: aws.String(file),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Create failed: %s", err)
+		}
+		defer resp.Body.Close()
+	}
+	// client_test.go:836: webhdfs Create failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PostOpParam.Op.UNSETSTORAGEPOLICY in java.lang.IllegalArgumentException
+}
