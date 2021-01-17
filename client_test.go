@@ -443,3 +443,19 @@ func TestClient_Rename(t *testing.T) {
 	// client_test.go:435: ModificationTime: 2021-01-17 20:19:39.991 +0800 CST
 	// client_test.go:436: Type: FILE
 }
+
+func TestClient_SetReplication(t *testing.T) {
+	file := "/data/test/create.txt"
+	resp, err := getClient(t).SetReplication(&webhdfs.SetReplicationRequest{
+		Path:        aws.String(file),
+		Replication: aws.Int(1),
+	})
+	if err != nil {
+		t.Fatalf("webhdfs Open failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
+	t.Logf("Boolean: %t", resp.Boolean)
+	// client_test.go:457: ContentType: application/json
+	// client_test.go:458: Boolean: true
+}
