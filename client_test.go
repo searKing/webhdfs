@@ -395,3 +395,39 @@ func TestClient_CreateSymlink(t *testing.T) {
 	}
 	// client_test.go:376: webhdfs Open failed: UnsupportedOperationException: Symlinks not supported in java.lang.UnsupportedOperationException
 }
+
+func TestClient_Rename(t *testing.T) {
+	dir := "/data/test/create"
+	{
+		resp, err := getClient(t).Rename(&webhdfs.RenameRequest{
+			Path:        aws.String(dir),
+			Destination: aws.String("/data/test/rename"),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Open failed: %s", err)
+		}
+		defer resp.Body.Close()
+		t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
+		t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+	}
+
+	{
+		resp, err := getClient(t).GetFileStatus(&webhdfs.GetFileStatusRequest{
+			Path: aws.String("/data/test/rename"),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Open failed: %s", err)
+		}
+		defer resp.Body.Close()
+		t.Logf("FileStatus: %v", resp.FileStatus)
+		t.Logf("AccessTime: %s", resp.FileStatus.AccessTime.Time.String())
+		t.Logf("ModificationTime: %s", resp.FileStatus.ModificationTime.Time.String())
+		t.Logf("Type: %s", resp.FileStatus.Type)
+	}
+	// client_test.go:410: ContentType: application/json
+	// client_test.go:411: ContentLength: 17
+	// client_test.go:422: FileStatus: {0 0 0 18823 supergroup 0 -1307645760304418816 hdfs  755 0  DIRECTORY}
+	// client_test.go:423: AccessTime: 1970-01-01 08:00:00 +0800 CST
+	// client_test.go:424: ModificationTime: 2021-01-17 18:24:25.335 +0800 CST
+	// client_test.go:425: Type: DIRECTORY
+}

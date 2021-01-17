@@ -11,7 +11,7 @@ import (
 	"github.com/searKing/golang/go/errors"
 )
 
-type CreateSymlinkRequest struct {
+type RenameRequest struct {
 	// Path of the object to get.
 	//
 	// Path is a required field
@@ -24,38 +24,28 @@ type CreateSymlinkRequest struct {
 	// Valid Values		An absolute FileSystem path without scheme and authority.
 	// Syntax			Any path.
 	Destination *string `validate:"required"`
-
-	// Name				createparent
-	// Description		If the parent directories do not exist, should they be created?
-	// Type				boolean
-	// Default Value	true
-	// Valid Values		true, false
-	// Syntax			true
-	CreateParent *bool
 }
 
-type CreateSymlinkResponse struct {
+type RenameResponse struct {
 	NameNode string `json:"-"`
 	ErrorResponse
 	HttpResponse `json:"-"`
+	Boolean      Boolean `json:"boolean"`
 }
 
-func (req *CreateSymlinkRequest) RawPath() string {
+func (req *RenameRequest) RawPath() string {
 	return aws.StringValue(req.Path)
 }
-func (req *CreateSymlinkRequest) RawQuery() string {
+func (req *RenameRequest) RawQuery() string {
 	v := url.Values{}
-	v.Set("op", OpCreateSymlink)
+	v.Set("op", OpRename)
 	if req.Destination != nil {
 		v.Set("destination", fmt.Sprintf("%s", aws.StringValue(req.Destination)))
-	}
-	if req.CreateParent != nil {
-		v.Set("createParent", fmt.Sprintf("%t", aws.BoolValue(req.CreateParent)))
 	}
 	return v.Encode()
 }
 
-func (resp *CreateSymlinkResponse) UnmarshalHTTP(httpResp *http.Response) error {
+func (resp *RenameResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	resp.HttpResponse.UnmarshalHTTP(httpResp)
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
@@ -72,9 +62,9 @@ func (resp *CreateSymlinkResponse) UnmarshalHTTP(httpResp *http.Response) error 
 	return nil
 }
 
-// Create a Symbolic Link
-// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Create_a_Symbolic_Link
-func (c *Client) CreateSymlink(req *CreateSymlinkRequest) (*CreateSymlinkResponse, error) {
+// Rename a File/Directory
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Rename_a_File.2FDirectory
+func (c *Client) Rename(req *RenameRequest) (*RenameResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -101,7 +91,7 @@ func (c *Client) CreateSymlink(req *CreateSymlinkRequest) (*CreateSymlinkRespons
 			continue
 		}
 
-		var resp CreateSymlinkResponse
+		var resp RenameResponse
 		resp.NameNode = addr
 
 		if err := resp.UnmarshalHTTP(httpResp); err != nil {
