@@ -498,3 +498,16 @@ func TestClient_SetTimes(t *testing.T) {
 	t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
 	// client_test.go:498: ContentType: application/octet-stream
 }
+
+func TestClient_RenewDelegationToken(t *testing.T) {
+	token := "HAAEaGRmcwRoZGZzAIoBdxB0SHCKAXc0gMxwMgcUR3A39bW0mraYQRzjjs3X3mH7fdkSV0VCSERGUyBkZWxlZ2F0aW9uDzE3Mi4xNy4wLjI6ODAyMA"
+	resp, err := getClient(t).RenewDelegationToken(&webhdfs.RenewDelegationTokenRequest{
+		Token: aws.String(token),
+	})
+	if err != nil {
+		t.Fatalf("webhdfs Open failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("Long: %d", resp.Long)
+	// client_test.go:511: Long: 1610975228598
+}
