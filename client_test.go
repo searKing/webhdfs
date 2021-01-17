@@ -832,7 +832,7 @@ func TestClient_UnsetStoragePolicy(t *testing.T) {
 			Path: aws.String(file),
 		})
 		if err != nil {
-			t.Fatalf("webhdfs Create failed: %s", err)
+			t.Fatalf("webhdfs UnsetStoragePolicy failed: %s", err)
 		}
 		defer resp.Body.Close()
 	}
@@ -846,7 +846,21 @@ func TestClient_UnsetECPolicy(t *testing.T) {
 			Path: aws.String(file),
 		})
 		if err != nil {
-			t.Fatalf("webhdfs Create failed: %s", err)
+			t.Fatalf("webhdfs UnsetECPolicy failed: %s", err)
+		}
+		defer resp.Body.Close()
+	}
+	// client_test.go:850: webhdfs Create failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PostOpParam.Op.UNSETECPOLICY in java.lang.IllegalArgumentException
+}
+
+func TestClient_Delete(t *testing.T) {
+	file := "/data/test/test.txt"
+	{
+		resp, err := getClient(t).Delete(&webhdfs.DeleteRequest{
+			Path: aws.String(file),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Delete failed: %s", err)
 		}
 		defer resp.Body.Close()
 	}
