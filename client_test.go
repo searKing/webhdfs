@@ -41,10 +41,10 @@ func TestClient_Open(t *testing.T) {
 	resp, err := getClient(t).Open(&webhdfs.OpenRequest{
 		Path: aws.String("/data/test/core-site.xml"),
 	})
-	defer resp.Body.Close()
 	if err != nil {
 		t.Fatalf("webhdfs Open failed: %s", err)
 	}
+	defer resp.Body.Close()
 	t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
 	t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
 	// client_test.go:48: ContentType: application/octet-stream
@@ -286,4 +286,35 @@ func TestClient_GetECPolicy(t *testing.T) {
 	defer resp.Body.Close()
 	t.Logf("ECPolicy: %v", resp.ECPolicy)
 	// client_test.go:285: webhdfs GetFileBlockLocations failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.GetOpParam.Op.GETECPOLICY in java.lang.IllegalArgumentException
+}
+
+func TestClient_Create(t *testing.T) {
+	file := "/data/test/create.txt"
+	{
+		resp, err := getClient(t).Create(&webhdfs.CreateRequest{
+			Path: aws.String(file),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Open failed: %s", err)
+		}
+		defer resp.Body.Close()
+		t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
+		t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+	}
+
+	{
+		resp, err := getClient(t).Open(&webhdfs.OpenRequest{
+			Path: aws.String(file),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Open failed: %s", err)
+		}
+		defer resp.Body.Close()
+		t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
+		t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+	}
+	// client_test.go:301: ContentType:
+	// client_test.go:302: ContentLength: 0
+	// client_test.go:313: ContentType: application/octet-stream
+	// client_test.go:314: ContentLength: 0
 }
