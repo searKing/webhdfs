@@ -12,7 +12,7 @@ import (
 	"github.com/searKing/golang/go/errors"
 )
 
-type SetXAttrRequest struct {
+type RemoveXAttrRequest struct {
 	// Path of the object to get.
 	//
 	// Path is a required field
@@ -25,47 +25,27 @@ type SetXAttrRequest struct {
 	// Valid Values		Any string prefixed with user./trusted./system./security..
 	// Syntax			Any string prefixed with user./trusted./system./security..
 	XAttrName *string `validate:"required"`
-	// Name				xattr.value
-	// Description		The XAttr value of a file/directory.
-	// Type				String
-	// Default Value	<empty>
-	// Valid Values		An encoded value.
-	// Syntax			Enclosed in double quotes or prefixed with 0x or 0s.
-	XAttrValue *string `validate:"required"`
-	// Name	flag
-	// Description	The XAttr set flag.
-	// Type	String
-	// Default Value	<empty>
-	// Valid Values	CREATE,REPLACE.
-	// Syntax	CREATE,REPLACE.
-	XAttrFlag *XAttrSetFlag `validate:"required"`
 }
 
-type SetXAttrResponse struct {
+type RemoveXAttrResponse struct {
 	NameNode string `json:"-"`
 	ErrorResponse
 	HttpResponse `json:"-"`
 }
 
-func (req *SetXAttrRequest) RawPath() string {
+func (req *RemoveXAttrRequest) RawPath() string {
 	return aws.StringValue(req.Path)
 }
-func (req *SetXAttrRequest) RawQuery() string {
+func (req *RemoveXAttrRequest) RawQuery() string {
 	v := url.Values{}
-	v.Set("op", OpSetXAttr)
+	v.Set("op", OpRemoveXAttr)
 	if req.XAttrName != nil {
 		v.Set("xattr.name", aws.StringValue(req.XAttrName))
-	}
-	if req.XAttrValue != nil {
-		v.Set("xattr.value", aws.StringValue(req.XAttrValue))
-	}
-	if req.XAttrFlag != nil {
-		v.Set("flag", aws.StringValue((*string)(req.XAttrFlag)))
 	}
 	return v.Encode()
 }
 
-func (resp *SetXAttrResponse) UnmarshalHTTP(httpResp *http.Response) error {
+func (resp *RemoveXAttrResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	resp.HttpResponse.UnmarshalHTTP(httpResp)
 	defer resp.Body.Close()
 	if isSuccessHttpCode(httpResp.StatusCode) {
@@ -85,9 +65,9 @@ func (resp *SetXAttrResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	return nil
 }
 
-// Set XAttr
-// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Set_XAttr
-func (c *Client) SetXAttr(req *SetXAttrRequest) (*SetXAttrResponse, error) {
+// Remove XAttr
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Remove_XAttr
+func (c *Client) RemoveXAttr(req *RemoveXAttrRequest) (*RemoveXAttrResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -114,7 +94,7 @@ func (c *Client) SetXAttr(req *SetXAttrRequest) (*SetXAttrResponse, error) {
 			continue
 		}
 
-		var resp SetXAttrResponse
+		var resp RemoveXAttrResponse
 		resp.NameNode = addr
 
 		if err := resp.UnmarshalHTTP(httpResp); err != nil {
