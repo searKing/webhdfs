@@ -8,3 +8,7 @@ require (
 	github.com/jcmturner/gokrb5/v8 v8.4.2
 	github.com/searKing/golang v0.0.107
 )
+
+replace (
+	github.com/searKing/golang v0.0.107 => ../../../github.com/searKing/golang
+)

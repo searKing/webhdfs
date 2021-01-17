@@ -485,3 +485,16 @@ func TestClient_SetPermission(t *testing.T) {
 	t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
 	// client_test.go:482: webhdfs Open failed: IllegalArgumentException: Both owner and group are empty. in java.lang.IllegalArgumentException
 }
+
+func TestClient_SetTimes(t *testing.T) {
+	file := "/data/test/create.txt"
+	resp, err := getClient(t).SetTimes(&webhdfs.SetTimesRequest{
+		Path: aws.String(file),
+	})
+	if err != nil {
+		t.Fatalf("webhdfs Open failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
+	// client_test.go:498: ContentType: application/octet-stream
+}

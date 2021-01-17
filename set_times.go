@@ -10,48 +10,62 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 
 	"github.com/searKing/golang/go/errors"
+	time_ "github.com/searKing/golang/go/time"
 )
 
-type SetReplicationRequest struct {
+type SetTimesRequest struct {
 	// Path of the object to get.
 	//
 	// Path is a required field
 	Path *string `validate:"required"`
 
-	// Name			replication
-	// Description	The number of replications of a file.
-	// Type			short
-	// Default Value	Specified in the configuration.
-	// Valid Values	> 0
-	// Syntax		Any integer.
-	Replication *int `validate:"required"`
+	// Name				modificationtime
+	// Description		The modification time of a file/directory.
+	// Type				long
+	// Default Value	-1 (means keeping it unchanged)
+	// Valid Values		-1 or a timestamp
+	// Syntax			Any integer.
+	Modificationtime *time_.UnixTimeMillisecond
+
+	// Name				accesstime
+	// Description		The access time of a file/directory.
+	// Type				long
+	// Default Value	-1 (means keeping it unchanged)
+	// Valid Values		-1 or a timestamp
+	// Syntax			Any integer.
+	Accesstime *time_.UnixTimeMillisecond
 }
 
-type SetReplicationResponse struct {
+type SetTimesResponse struct {
 	NameNode string `json:"-"`
 	ErrorResponse
 	HttpResponse `json:"-"`
-	Boolean      Boolean `json:"boolean"`
 }
 
-func (req *SetReplicationRequest) RawPath() string {
+func (req *SetTimesRequest) RawPath() string {
 	return aws.StringValue(req.Path)
 }
-func (req *SetReplicationRequest) RawQuery() string {
+func (req *SetTimesRequest) RawQuery() string {
 	v := url.Values{}
-	v.Set("op", OpSetReplication)
-	if req.Replication != nil {
-		v.Set("replication", fmt.Sprintf("%d", aws.IntValue(req.Replication)))
+	v.Set("op", OpSetTimes)
+	if req.Modificationtime != nil {
+		v.Set("modificationtime", req.Modificationtime.String())
+	}
+	if req.Accesstime != nil {
+		v.Set("accesstime", req.Accesstime.String())
 	}
 	return v.Encode()
 }
 
-func (resp *SetReplicationResponse) UnmarshalHTTP(httpResp *http.Response) error {
+func (resp *SetTimesResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	resp.HttpResponse.UnmarshalHTTP(httpResp)
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
+	}
+	if isSuccessHttpCode(httpResp.StatusCode) {
+		return nil
 	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
@@ -65,7 +79,7 @@ func (resp *SetReplicationResponse) UnmarshalHTTP(httpResp *http.Response) error
 
 // Replication
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Replication
-func (c *Client) SetReplication(req *SetReplicationRequest) (*SetReplicationResponse, error) {
+func (c *Client) SetTimes(req *SetTimesRequest) (*SetTimesResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -92,7 +106,7 @@ func (c *Client) SetReplication(req *SetReplicationRequest) (*SetReplicationResp
 			continue
 		}
 
-		var resp SetReplicationResponse
+		var resp SetTimesResponse
 		resp.NameNode = addr
 
 		if err := resp.UnmarshalHTTP(httpResp); err != nil {
