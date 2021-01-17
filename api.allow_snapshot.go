@@ -12,51 +12,29 @@ import (
 	"github.com/searKing/golang/go/errors"
 )
 
-type SetPermissionRequest struct {
+type AllowSnapshotRequest struct {
 	// Path of the object to get.
 	//
 	// Path is a required field
 	Path *string `validate:"required"`
-
-	// Name				owner
-	// Description		The username who is the owner of a file/directory.
-	// Type				String
-	// Default Value	<empty> (means keeping it unchanged)
-	// Valid Values		Any valid username.
-	// Syntax			Any string.
-	Owner *string
-
-	// Name				group
-	// Description		The name of a group.
-	// Type				String
-	// Default Value	<empty> (means keeping it unchanged)
-	// Valid Values		Any valid group name.
-	// Syntax			Any string.
-	Group *string
 }
 
-type SetPermissionResponse struct {
+type AllowSnapshotResponse struct {
 	NameNode string `json:"-"`
 	ErrorResponse
 	HttpResponse `json:"-"`
 }
 
-func (req *SetPermissionRequest) RawPath() string {
+func (req *AllowSnapshotRequest) RawPath() string {
 	return aws.StringValue(req.Path)
 }
-func (req *SetPermissionRequest) RawQuery() string {
+func (req *AllowSnapshotRequest) RawQuery() string {
 	v := url.Values{}
-	v.Set("op", OpSetPermission)
-	if req.Owner != nil {
-		v.Set("owner", aws.StringValue(req.Owner))
-	}
-	if req.Group != nil {
-		v.Set("group", aws.StringValue(req.Group))
-	}
+	v.Set("op", OpAllowSnapshot)
 	return v.Encode()
 }
 
-func (resp *SetPermissionResponse) UnmarshalHTTP(httpResp *http.Response) error {
+func (resp *AllowSnapshotResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	resp.HttpResponse.UnmarshalHTTP(httpResp)
 	defer resp.Body.Close()
 	if isSuccessHttpCode(httpResp.StatusCode) {
@@ -66,19 +44,21 @@ func (resp *SetPermissionResponse) UnmarshalHTTP(httpResp *http.Response) error 
 	if err != nil {
 		return err
 	}
-	err = json.Unmarshal(body, &resp)
-	if err != nil {
+	if err = json.Unmarshal(body, &resp); err != nil {
 		return err
 	}
+
 	if err := resp.Exception(); err != nil {
 		return err
 	}
 	return nil
 }
 
-// Set Owner
-// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Set_Owner
-func (c *Client) SetPermission(req *SetPermissionRequest) (*SetPermissionResponse, error) {
+// Renew Delegation Token
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Renew_Delegation_Token
+// expire time set by server "dfs.namenode.delegation.token.max-lifetime"
+// See: https://hadoop.apache.org/docs/r2.7.1/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml#dfs.namenode.delegation.token.max-lifetime
+func (c *Client) AllowSnapshot(req *AllowSnapshotRequest) (*AllowSnapshotResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -105,14 +85,13 @@ func (c *Client) SetPermission(req *SetPermissionRequest) (*SetPermissionRespons
 			continue
 		}
 
-		var resp SetPermissionResponse
+		var resp AllowSnapshotResponse
 		resp.NameNode = addr
 
 		if err := resp.UnmarshalHTTP(httpResp); err != nil {
 			errs = append(errs, err)
 			continue
 		}
-
 		return &resp, nil
 	}
 	return nil, errors.Multi(errs...)

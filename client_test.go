@@ -466,7 +466,7 @@ func TestClient_SetOwner(t *testing.T) {
 		Path: aws.String(file),
 	})
 	if err != nil {
-		t.Fatalf("webhdfs Open failed: %s", err)
+		t.Fatalf("webhdfs SetOwner failed: %s", err)
 	}
 	defer resp.Body.Close()
 	t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
@@ -475,15 +475,15 @@ func TestClient_SetOwner(t *testing.T) {
 
 func TestClient_SetPermission(t *testing.T) {
 	file := "/data/test/create.txt"
-	resp, err := getClient(t).SetOwner(&webhdfs.SetOwnerRequest{
+	resp, err := getClient(t).SetPermission(&webhdfs.SetPermissionRequest{
 		Path: aws.String(file),
 	})
 	if err != nil {
-		t.Fatalf("webhdfs Open failed: %s", err)
+		t.Fatalf("webhdfs SetPermission failed: %s", err)
 	}
 	defer resp.Body.Close()
 	t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
-	// client_test.go:482: webhdfs Open failed: IllegalArgumentException: Both owner and group are empty. in java.lang.IllegalArgumentException
+	// client_test.go:485: ContentType: application/octet-stream
 }
 
 func TestClient_SetTimes(t *testing.T) {
@@ -492,7 +492,7 @@ func TestClient_SetTimes(t *testing.T) {
 		Path: aws.String(file),
 	})
 	if err != nil {
-		t.Fatalf("webhdfs Open failed: %s", err)
+		t.Fatalf("webhdfs SetTimes failed: %s", err)
 	}
 	defer resp.Body.Close()
 	t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
@@ -505,7 +505,7 @@ func TestClient_RenewDelegationToken(t *testing.T) {
 		Token: aws.String(token),
 	})
 	if err != nil {
-		t.Fatalf("webhdfs Open failed: %s", err)
+		t.Fatalf("webhdfs RenewDelegationToken failed: %s", err)
 	}
 	defer resp.Body.Close()
 	t.Logf("Long: %d", resp.Long)
@@ -518,9 +518,22 @@ func TestClient_CancelDelegationToken(t *testing.T) {
 		Token: aws.String(token),
 	})
 	if err != nil {
-		t.Fatalf("webhdfs Open failed: %s", err)
+		t.Fatalf("webhdfs CancelDelegationToken failed: %s", err)
 	}
 	defer resp.Body.Close()
 	t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
 	// client_test.go:521: webhdfs Open failed: InvalidToken: Token not found in org.apache.hadoop.security.token.SecretManager$InvalidToken
+}
+
+func TestClient_AllowSnapshot(t *testing.T) {
+	file := "/data/test/create.txt"
+	resp, err := getClient(t).AllowSnapshot(&webhdfs.AllowSnapshotRequest{
+		Path: aws.String(file),
+	})
+	if err != nil {
+		t.Fatalf("webhdfs AllowSnapshot failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+	// client_test.go:534: webhdfs AllowSnapshot failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PutOpParam.Op.ALLOWSNAPSHOT in java.lang.IllegalArgumentException
 }
