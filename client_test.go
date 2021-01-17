@@ -672,3 +672,57 @@ func TestClient_SetECPolicy(t *testing.T) {
 	t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
 	// client_test.go:669: webhdfs SetECPolicy failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PutOpParam.Op.SETECPOLICY in java.lang.IllegalArgumentException
 }
+
+func TestClient_Append(t *testing.T) {
+	file := "/data/test/append.txt"
+	{
+		resp, err := getClient(t).Create(&webhdfs.CreateRequest{
+			Path: aws.String(file),
+			Body: strings.NewReader("create"),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Create failed: %s", err)
+		}
+		defer resp.Body.Close()
+		t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
+		t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+	}
+	{
+		resp, err := getClient(t).Append(&webhdfs.AppendRequest{
+			Path: aws.String(file),
+			Body: strings.NewReader("append"),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Append failed: %s", err)
+		}
+		defer resp.Body.Close()
+		t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
+		t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+	}
+
+	{
+		resp, err := getClient(t).Open(&webhdfs.OpenRequest{
+			Path: aws.String(file),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Open failed: %s", err)
+		}
+		defer resp.Body.Close()
+		t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
+		t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+
+		content, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatalf("webhdfs Read failed: %s", err)
+		}
+		t.Logf("content: %s", string(content))
+
+	}
+	// client_test.go:687: ContentType:
+	// client_test.go:688: ContentLength: 0
+	// client_test.go:699: ContentType:
+	// client_test.go:700: ContentLength: 0
+	// client_test.go:711: ContentType: application/octet-stream
+	// client_test.go:712: ContentLength: 66
+	// client_test.go:718: content: createappend
+}

@@ -91,12 +91,12 @@ func (c *Client) SetOwner(req *SetOwnerRequest) (*SetOwnerResponse, error) {
 	for _, addr := range nameNodes {
 		u.Host = addr
 
-		req, err := http.NewRequest(http.MethodPut, u.String(), nil)
+		httpReq, err := http.NewRequest(http.MethodPut, u.String(), nil)
 		if err != nil {
 			return nil, err
 		}
 
-		httpResp, err := c.httpClient.Do(req)
+		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)
 			continue

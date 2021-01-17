@@ -70,6 +70,9 @@ type CreateResponse struct {
 	NameNode string `json:"-"`
 	ErrorResponse
 	HttpResponse `json:"-"`
+
+	NoDirect bool    `json:"-"`
+	Location *string `json:"Location"`
 }
 
 func (req *CreateRequest) RawPath() string {
@@ -102,7 +105,7 @@ func (req *CreateRequest) RawQuery() string {
 func (resp *CreateResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	resp.HttpResponse.UnmarshalHTTP(httpResp)
 
-	if isSuccessHttpCode(httpResp.StatusCode) {
+	if isSuccessHttpCode(httpResp.StatusCode) && !resp.NoDirect {
 		return nil
 	}
 	defer resp.Body.Close()
@@ -140,12 +143,12 @@ func (c *Client) Create(req *CreateRequest) (*CreateResponse, error) {
 	for _, addr := range nameNodes {
 		u.Host = addr
 
-		req, err := http.NewRequest(http.MethodPut, u.String(), req.Body)
+		httpReq, err := http.NewRequest(http.MethodPut, u.String(), req.Body)
 		if err != nil {
 			return nil, err
 		}
 
-		httpResp, err := c.httpClient.Do(req)
+		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)
 			continue
@@ -153,6 +156,7 @@ func (c *Client) Create(req *CreateRequest) (*CreateResponse, error) {
 
 		var resp CreateResponse
 		resp.NameNode = addr
+		resp.NoDirect = aws.BoolValue(req.NoDirect)
 
 		if err := resp.UnmarshalHTTP(httpResp); err != nil {
 			errs = append(errs, err)

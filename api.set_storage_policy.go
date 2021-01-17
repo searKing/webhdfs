@@ -47,10 +47,10 @@ func (req *SetStoragePolicyRequest) RawQuery() string {
 
 func (resp *SetStoragePolicyResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	resp.HttpResponse.UnmarshalHTTP(httpResp)
-	defer resp.Body.Close()
 	if isSuccessHttpCode(httpResp.StatusCode) {
 		return nil
 	}
+	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -85,12 +85,12 @@ func (c *Client) SetStoragePolicy(req *SetStoragePolicyRequest) (*SetStoragePoli
 	for _, addr := range nameNodes {
 		u.Host = addr
 
-		req, err := http.NewRequest(http.MethodPut, u.String(), nil)
+		httpReq, err := http.NewRequest(http.MethodPut, u.String(), nil)
 		if err != nil {
 			return nil, err
 		}
 
-		httpResp, err := c.httpClient.Do(req)
+		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)
 			continue

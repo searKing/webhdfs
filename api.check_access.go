@@ -46,10 +46,10 @@ func (req *CheckAccessRequest) RawQuery() string {
 
 func (resp *CheckAccessResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	resp.HttpResponse.UnmarshalHTTP(httpResp)
-	defer resp.Body.Close()
 	if isSuccessHttpCode(httpResp.StatusCode) {
 		return nil
 	}
+	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

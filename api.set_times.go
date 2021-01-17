@@ -59,13 +59,13 @@ func (req *SetTimesRequest) RawQuery() string {
 
 func (resp *SetTimesResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	resp.HttpResponse.UnmarshalHTTP(httpResp)
+	if isSuccessHttpCode(httpResp.StatusCode) {
+		return nil
+	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
-	}
-	if isSuccessHttpCode(httpResp.StatusCode) {
-		return nil
 	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
@@ -95,12 +95,12 @@ func (c *Client) SetTimes(req *SetTimesRequest) (*SetTimesResponse, error) {
 	for _, addr := range nameNodes {
 		u.Host = addr
 
-		req, err := http.NewRequest(http.MethodPut, u.String(), nil)
+		httpReq, err := http.NewRequest(http.MethodPut, u.String(), nil)
 		if err != nil {
 			return nil, err
 		}
 
-		httpResp, err := c.httpClient.Do(req)
+		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)
 			continue

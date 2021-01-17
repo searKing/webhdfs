@@ -31,6 +31,9 @@ type GetFileChecksumResponse struct {
 	ErrorResponse
 	HttpResponse `json:"-"`
 	FileChecksum FileChecksum `json:"FileChecksum"`
+
+	NoDirect bool    `json:"-"`
+	Location *string `json:"Location"`
 }
 
 func (req *GetFileChecksumRequest) RawPath() string {
@@ -47,6 +50,9 @@ func (req *GetFileChecksumRequest) RawQuery() string {
 
 func (resp *GetFileChecksumResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	resp.HttpResponse.UnmarshalHTTP(httpResp)
+	if isSuccessHttpCode(httpResp.StatusCode) && !resp.NoDirect {
+		return nil
+	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
@@ -89,6 +95,7 @@ func (c *Client) GetFileChecksum(req *GetFileChecksumRequest) (*GetFileChecksumR
 
 		var resp GetFileChecksumResponse
 		resp.NameNode = addr
+		resp.NoDirect = aws.BoolValue(req.NoDirect)
 
 		if err := resp.UnmarshalHTTP(httpResp); err != nil {
 			errs = append(errs, err)
