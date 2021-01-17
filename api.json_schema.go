@@ -73,7 +73,7 @@ const (
 )
 
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#FileStatus_JSON_Schema
-type FileStatus FileStatusProperties
+type FileStatus = FileStatusProperties
 
 //type FileStatus struct {
 //	FileStatus FileStatusProperties `json:"FileStatus" validate:"required"` // See FileStatus Properties.
@@ -83,18 +83,18 @@ type FileStatus FileStatusProperties
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#FileStatus_Properties
 type FileStatusProperties struct {
 	AccessTime       time.UnixTimeMillisecond `json:"accessTime" validate:"required"`       // The access time.
-	BlockSize        int           `json:"blockSize" validate:"required"`        // The block size of a file.
-	ChildrenNum      int           `json:"childrenNum"`                          // The number of sub files or dirs
-	FileId           int           `json:"fileId"`                               // The file id
-	Group            string        `json:"group" validate:"required"`            // The group owner.
-	Length           int           `json:"length" validate:"required"`           // The number of bytes in a file. in bytes, zero for directories
+	BlockSize        int                      `json:"blockSize" validate:"required"`        // The block size of a file.
+	ChildrenNum      int                      `json:"childrenNum"`                          // The number of sub files or dirs
+	FileId           int                      `json:"fileId"`                               // The file id
+	Group            string                   `json:"group" validate:"required"`            // The group owner.
+	Length           int                      `json:"length" validate:"required"`           // The number of bytes in a file. in bytes, zero for directories
 	ModificationTime time.UnixTimeMillisecond `json:"modificationTime" validate:"required"` // The modification time.
-	Owner            string        `json:"owner" validate:"required"`            // The user who is the owner.
-	PathSuffix       string        `json:"pathSuffix" validate:"required"`       // The path suffix.
-	Permission       string        `json:"permission" validate:"required"`       // The permission represented as a octal string.
-	Replication      int           `json:"replication" validate:"required"`      // The number of replication of a file.
-	Symlink          string        `json:"symlink"`                              // The link target of a symlink.
-	Type             FileType      `json:"type" validate:"required"`             // The type of the path object. ["FILE", "DIRECTORY", "SYMLINK"]
+	Owner            string                   `json:"owner" validate:"required"`            // The user who is the owner.
+	PathSuffix       string                   `json:"pathSuffix" validate:"required"`       // The path suffix.
+	Permission       string                   `json:"permission" validate:"required"`       // The permission represented as a octal string.
+	Replication      int                      `json:"replication" validate:"required"`      // The number of replication of a file.
+	Symlink          string                   `json:"symlink"`                              // The link target of a symlink.
+	Type             FileType                 `json:"type" validate:"required"`             // The type of the path object. ["FILE", "DIRECTORY", "SYMLINK"]
 }
 
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#FileStatuses_JSON_Schema
@@ -202,12 +202,12 @@ type SnapshottableDirectoryStatus struct {
 }
 
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#BlockLocations_JSON_Schema
-type BlockLocations struct {
+type BlockLocations = struct {
+	BlockLocations []BlockLocation `json:"BlockLocation"` // An array of BlockLocation
 }
 
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#BlockLocation_JSON_Schema
-type BlockLocation struct {
-}
+type BlockLocation = BlockLocationProperties
 
 // JavaScript syntax is used to define blockLocationProperties so that it can be referred in both BlockLocation and BlockLocations JSON schemas.
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#BlockLocation_Properties

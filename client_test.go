@@ -232,7 +232,7 @@ func TestClient_GetAllStoragePolicy(t *testing.T) {
 func TestClient_GetStoragePolicy(t *testing.T) {
 	resp, err := getClient(t).GetStoragePolicy(&webhdfs.GetStoragePolicyRequest{})
 	if err != nil {
-		t.Fatalf("webhdfs GetAllStoragePolicy failed: %s", err)
+		t.Fatalf("webhdfs GetStoragePolicy failed: %s", err)
 	}
 	defer resp.Body.Close()
 	t.Logf("BlockStoragePolicy: %v", resp.BlockStoragePolicy)
@@ -245,7 +245,7 @@ func TestClient_GetSnapshotDiff(t *testing.T) {
 		Snapshotname:    aws.String("test"),
 	})
 	if err != nil {
-		t.Fatalf("webhdfs GetAllStoragePolicy failed: %s", err)
+		t.Fatalf("webhdfs GetSnapshotDiff failed: %s", err)
 	}
 	defer resp.Body.Close()
 	t.Logf("SnapshotDiffReport: %v", resp.SnapshotDiffReport)
@@ -257,9 +257,21 @@ func TestClient_GetSnapshottableDirectoryList(t *testing.T) {
 		Username: aws.String("hdfs"),
 	})
 	if err != nil {
-		t.Fatalf("webhdfs GetAllStoragePolicy failed: %s", err)
+		t.Fatalf("webhdfs GetSnapshottableDirectoryList failed: %s", err)
 	}
 	defer resp.Body.Close()
 	t.Logf("SnapshottableDirectoryList: %v", resp.SnapshottableDirectoryList)
 	// client_test.go:258: webhdfs GetAllStoragePolicy failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.GetOpParam.Op.GETSNAPSHOTTABLEDIRECTORYLIST in java.lang.IllegalArgumentException
+}
+
+func TestClient_GetFileBlockLocations(t *testing.T) {
+	resp, err := getClient(t).GetFileBlockLocations(&webhdfs.GetFileBlockLocationsRequest{
+		Path: aws.String("/data/test/core-site.xml"),
+	})
+	if err != nil {
+		t.Fatalf("webhdfs GetFileBlockLocations failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("BlockLocations: %v", resp.BlockLocations)
+	// client_test.go:273: webhdfs GetAllStoragePolicy failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.GetOpParam.Op.GETFILEBLOCKLOCATIONS in java.lang.IllegalArgumentException
 }
