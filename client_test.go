@@ -459,3 +459,16 @@ func TestClient_SetReplication(t *testing.T) {
 	// client_test.go:457: ContentType: application/json
 	// client_test.go:458: Boolean: true
 }
+
+func TestClient_SetOwner(t *testing.T) {
+	file := "/data/test/create.txt"
+	resp, err := getClient(t).SetOwner(&webhdfs.SetOwnerRequest{
+		Path: aws.String(file),
+	})
+	if err != nil {
+		t.Fatalf("webhdfs Open failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
+	// client_test.go:469: webhdfs Open failed: IllegalArgumentException: Both owner and group are empty. in java.lang.IllegalArgumentException
+}
