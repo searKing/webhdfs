@@ -364,3 +364,34 @@ func TestClient_Mkdirs(t *testing.T) {
 	// client_test.go:346: ModificationTime: 2021-01-17 18:24:25.335 +0800 CST
 	// client_test.go:347: Type: DIRECTORY
 }
+
+func TestClient_CreateSymlink(t *testing.T) {
+	dir := "/data/test/create"
+	{
+		resp, err := getClient(t).CreateSymlink(&webhdfs.CreateSymlinkRequest{
+			Path:        aws.String(dir),
+			Destination: aws.String("/data/test/create_symlink"),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Open failed: %s", err)
+		}
+		defer resp.Body.Close()
+		t.Logf("ContentType: %s", aws.StringValue(resp.ContentType))
+		t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+	}
+
+	{
+		resp, err := getClient(t).GetFileStatus(&webhdfs.GetFileStatusRequest{
+			Path: aws.String("/data/test/create_symlink"),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs Open failed: %s", err)
+		}
+		defer resp.Body.Close()
+		t.Logf("FileStatus: %v", resp.FileStatus)
+		t.Logf("AccessTime: %s", resp.FileStatus.AccessTime.Time.String())
+		t.Logf("ModificationTime: %s", resp.FileStatus.ModificationTime.Time.String())
+		t.Logf("Type: %s", resp.FileStatus.Type)
+	}
+	// client_test.go:376: webhdfs Open failed: UnsupportedOperationException: Symlinks not supported in java.lang.UnsupportedOperationException
+}
