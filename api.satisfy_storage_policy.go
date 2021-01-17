@@ -12,7 +12,7 @@ import (
 	"github.com/searKing/golang/go/errors"
 )
 
-type SetStoragePolicyRequest struct {
+type SatisfyStoragePolicyRequest struct {
 	// Path of the object to get.
 	//
 	// Path is a required field
@@ -27,25 +27,25 @@ type SetStoragePolicyRequest struct {
 	StoragePolicy *string `validate:"required"`
 }
 
-type SetStoragePolicyResponse struct {
+type SatisfyStoragePolicyResponse struct {
 	NameNode string `json:"-"`
 	ErrorResponse
 	HttpResponse `json:"-"`
 }
 
-func (req *SetStoragePolicyRequest) RawPath() string {
+func (req *SatisfyStoragePolicyRequest) RawPath() string {
 	return aws.StringValue(req.Path)
 }
-func (req *SetStoragePolicyRequest) RawQuery() string {
+func (req *SatisfyStoragePolicyRequest) RawQuery() string {
 	v := url.Values{}
-	v.Set("op", OpSetStoragePolicy)
+	v.Set("op", OpSatisfyStoragePolicy)
 	if req.StoragePolicy != nil {
 		v.Set("storagepolicy", aws.StringValue(req.StoragePolicy))
 	}
 	return v.Encode()
 }
 
-func (resp *SetStoragePolicyResponse) UnmarshalHTTP(httpResp *http.Response) error {
+func (resp *SatisfyStoragePolicyResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	resp.HttpResponse.UnmarshalHTTP(httpResp)
 	defer resp.Body.Close()
 	if isSuccessHttpCode(httpResp.StatusCode) {
@@ -69,7 +69,7 @@ func (resp *SetStoragePolicyResponse) UnmarshalHTTP(httpResp *http.Response) err
 
 // Set Storage Policy
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Set_Storage_Policy
-func (c *Client) SetStoragePolicy(req *SetStoragePolicyRequest) (*SetStoragePolicyResponse, error) {
+func (c *Client) SatisfyStoragePolicy(req *SatisfyStoragePolicyRequest) (*SatisfyStoragePolicyResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func (c *Client) SetStoragePolicy(req *SetStoragePolicyRequest) (*SetStoragePoli
 			continue
 		}
 
-		var resp SetStoragePolicyResponse
+		var resp SatisfyStoragePolicyResponse
 		resp.NameNode = addr
 
 		if err := resp.UnmarshalHTTP(httpResp); err != nil {

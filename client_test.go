@@ -608,7 +608,9 @@ func TestClient_RemoveXAttr(t *testing.T) {
 }
 
 func TestClient_SetStoragePolicy(t *testing.T) {
+	file := "/data/test/"
 	resp, err := getClient(t).SetStoragePolicy(&webhdfs.SetStoragePolicyRequest{
+		Path:          aws.String(file),
 		StoragePolicy: aws.String("policy"),
 	})
 	if err != nil {
@@ -617,4 +619,18 @@ func TestClient_SetStoragePolicy(t *testing.T) {
 	defer resp.Body.Close()
 	t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
 	// client_test.go:615: webhdfs RemoveXAttr failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PutOpParam.Op.SETSTORAGEPOLICY in java.lang.IllegalArgumentException
+}
+
+func TestClient_SatisfyStoragePolicy(t *testing.T) {
+	file := "/data/test/"
+	resp, err := getClient(t).SatisfyStoragePolicy(&webhdfs.SatisfyStoragePolicyRequest{
+		Path:          aws.String(file),
+		StoragePolicy: aws.String("policy"),
+	})
+	if err != nil {
+		t.Fatalf("webhdfs RemoveXAttr failed: %s", err)
+	}
+	defer resp.Body.Close()
+	t.Logf("ContentLength: %d", aws.Int64Value(resp.ContentLength))
+	// client_test.go:631: webhdfs RemoveXAttr failed: IllegalArgumentException: Invalid value for webhdfs parameter "op": No enum constant org.apache.hadoop.hdfs.web.resources.PutOpParam.Op.SATISFYSTORAGEPOLICY in java.lang.IllegalArgumentException
 }
