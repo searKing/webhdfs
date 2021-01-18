@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -74,6 +75,15 @@ func (resp *GetHomeDirectoryResponse) UnmarshalHTTP(httpResp *http.Response) err
 // Get Home Directory
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Get_Home_Directory
 func (c *Client) GetHomeDirectory(req *GetHomeDirectoryRequest) (*GetHomeDirectoryResponse, error) {
+	return c.getHomeDirectory(nil, req)
+}
+func (c *Client) GetHomeDirectoryWithContext(ctx context.Context, req *GetHomeDirectoryRequest) (*GetHomeDirectoryResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.getHomeDirectory(ctx, req)
+}
+func (c *Client) getHomeDirectory(ctx context.Context, req *GetHomeDirectoryRequest) (*GetHomeDirectoryResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -95,6 +105,9 @@ func (c *Client) GetHomeDirectory(req *GetHomeDirectoryRequest) (*GetHomeDirecto
 		}
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
 		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {

@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -93,6 +94,15 @@ func (resp *CreateSymlinkResponse) UnmarshalHTTP(httpResp *http.Response) error 
 // Create a Symbolic Link
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Create_a_Symbolic_Link
 func (c *Client) CreateSymlink(req *CreateSymlinkRequest) (*CreateSymlinkResponse, error) {
+	return c.createSymlink(nil, req)
+}
+func (c *Client) CreateSymlinkWithContext(ctx context.Context, req *CreateSymlinkRequest) (*CreateSymlinkResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.createSymlink(ctx, req)
+}
+func (c *Client) createSymlink(ctx context.Context, req *CreateSymlinkRequest) (*CreateSymlinkResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -116,6 +126,9 @@ func (c *Client) CreateSymlink(req *CreateSymlinkRequest) (*CreateSymlinkRespons
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
+		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)

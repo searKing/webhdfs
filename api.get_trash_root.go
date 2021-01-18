@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -76,6 +77,15 @@ func (resp *GetTrashRootResponse) UnmarshalHTTP(httpResp *http.Response) error {
 // For more details about trash root in an encrypted zone, please refer to Transparent Encryption Guide.
 // See also, https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/TransparentEncryption.html#Rename_and_Trash_considerations
 func (c *Client) GetTrashRoot(req *GetTrashRootRequest) (*GetTrashRootResponse, error) {
+	return c.getTrashRoot(nil, req)
+}
+func (c *Client) GetTrashRootWithContext(ctx context.Context, req *GetTrashRootRequest) (*GetTrashRootResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.getTrashRoot(ctx, req)
+}
+func (c *Client) getTrashRoot(ctx context.Context, req *GetTrashRootRequest) (*GetTrashRootResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -97,6 +107,9 @@ func (c *Client) GetTrashRoot(req *GetTrashRootRequest) (*GetTrashRootResponse, 
 		}
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
 		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {

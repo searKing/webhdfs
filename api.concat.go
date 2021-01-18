@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -93,6 +94,15 @@ func (resp *ConcatResponse) UnmarshalHTTP(httpResp *http.Response) error {
 // All blocks must be full in all source files except the last source file.
 // In the last source file, all blocks must be full except the last block.
 func (c *Client) Concat(req *ConcatRequest) (*ConcatResponse, error) {
+	return c.concat(nil, req)
+}
+func (c *Client) ConcatWithContext(ctx context.Context, req *ConcatRequest) (*ConcatResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.concat(ctx, req)
+}
+func (c *Client) concat(ctx context.Context, req *ConcatRequest) (*ConcatResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -116,6 +126,9 @@ func (c *Client) Concat(req *ConcatRequest) (*ConcatResponse, error) {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
+		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)

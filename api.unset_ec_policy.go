@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -76,6 +77,15 @@ func (resp *UnsetECPolicyResponse) UnmarshalHTTP(httpResp *http.Response) error 
 // Unset EC Policy
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Unset_EC_Policy
 func (c *Client) UnsetECPolicy(req *UnsetECPolicyRequest) (*UnsetECPolicyResponse, error) {
+	return c.unsetECPolicy(nil, req)
+}
+func (c *Client) UnsetECPolicyWithContext(ctx context.Context, req *UnsetECPolicyRequest) (*UnsetECPolicyResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.unsetECPolicy(ctx, req)
+}
+func (c *Client) unsetECPolicy(ctx context.Context, req *UnsetECPolicyRequest) (*UnsetECPolicyResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -99,6 +109,9 @@ func (c *Client) UnsetECPolicy(req *UnsetECPolicyRequest) (*UnsetECPolicyRespons
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
+		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)

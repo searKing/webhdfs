@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -93,6 +94,15 @@ func (resp *SetOwnerResponse) UnmarshalHTTP(httpResp *http.Response) error {
 // Set Owner
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Set_Owner
 func (c *Client) SetOwner(req *SetOwnerRequest) (*SetOwnerResponse, error) {
+	return c.setOwner(nil, req)
+}
+func (c *Client) SetOwnerWithContext(ctx context.Context, req *SetOwnerRequest) (*SetOwnerResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.setOwner(ctx, req)
+}
+func (c *Client) setOwner(ctx context.Context, req *SetOwnerRequest) (*SetOwnerResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -116,6 +126,9 @@ func (c *Client) SetOwner(req *SetOwnerRequest) (*SetOwnerResponse, error) {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
+		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)

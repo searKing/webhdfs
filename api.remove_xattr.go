@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -85,6 +86,15 @@ func (resp *RemoveXAttrResponse) UnmarshalHTTP(httpResp *http.Response) error {
 // Remove XAttr
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Remove_XAttr
 func (c *Client) RemoveXAttr(req *RemoveXAttrRequest) (*RemoveXAttrResponse, error) {
+	return c.removeXAttr(nil, req)
+}
+func (c *Client) RemoveXAttrWithContext(ctx context.Context, req *RemoveXAttrRequest) (*RemoveXAttrResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.removeXAttr(ctx, req)
+}
+func (c *Client) removeXAttr(ctx context.Context, req *RemoveXAttrRequest) (*RemoveXAttrResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -108,6 +118,9 @@ func (c *Client) RemoveXAttr(req *RemoveXAttrRequest) (*RemoveXAttrResponse, err
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
+		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)

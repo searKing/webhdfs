@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -90,6 +91,15 @@ func (resp *GetFileChecksumResponse) UnmarshalHTTP(httpResp *http.Response) erro
 // Get File Checksum
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Get_File_Checksum
 func (c *Client) GetFileChecksum(req *GetFileChecksumRequest) (*GetFileChecksumResponse, error) {
+	return c.getFileChecksum(nil, req)
+}
+func (c *Client) GetFileChecksumWithContext(ctx context.Context, req *GetFileChecksumRequest) (*GetFileChecksumResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.getFileChecksum(ctx, req)
+}
+func (c *Client) getFileChecksum(ctx context.Context, req *GetFileChecksumRequest) (*GetFileChecksumResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -111,6 +121,9 @@ func (c *Client) GetFileChecksum(req *GetFileChecksumRequest) (*GetFileChecksumR
 		}
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
 		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {

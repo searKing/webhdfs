@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -74,6 +75,15 @@ func (resp *GetContentSummaryResponse) UnmarshalHTTP(httpResp *http.Response) er
 // Get Content Summary of a Directory
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Get_Content_Summary_of_a_Directory
 func (c *Client) GetContentSummary(req *GetContentSummaryRequest) (*GetContentSummaryResponse, error) {
+	return c.getContentSummary(nil, req)
+}
+func (c *Client) GetContentSummaryWithContext(ctx context.Context, req *GetContentSummaryRequest) (*GetContentSummaryResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.getContentSummary(ctx, req)
+}
+func (c *Client) getContentSummary(ctx context.Context, req *GetContentSummaryRequest) (*GetContentSummaryResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -95,6 +105,9 @@ func (c *Client) GetContentSummary(req *GetContentSummaryRequest) (*GetContentSu
 		}
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
 		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {

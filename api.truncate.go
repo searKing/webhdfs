@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -87,6 +88,15 @@ func (resp *TruncateResponse) UnmarshalHTTP(httpResp *http.Response) error {
 // Truncate a File
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Truncate_a_File
 func (c *Client) Truncate(req *TruncateRequest) (*TruncateResponse, error) {
+	return c.truncate(nil, req)
+}
+func (c *Client) TruncateWithContext(ctx context.Context, req *TruncateRequest) (*TruncateResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.truncate(ctx, req)
+}
+func (c *Client) truncate(ctx context.Context, req *TruncateRequest) (*TruncateResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -110,6 +120,9 @@ func (c *Client) Truncate(req *TruncateRequest) (*TruncateResponse, error) {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
+		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)

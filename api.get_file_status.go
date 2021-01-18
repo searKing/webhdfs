@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -74,6 +75,15 @@ func (resp *GetFileStatusResponse) UnmarshalHTTP(httpResp *http.Response) error 
 // Status of a File/Directory
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Status_of_a_File.2FDirectory
 func (c *Client) GetFileStatus(req *GetFileStatusRequest) (*GetFileStatusResponse, error) {
+	return c.getFileStatus(nil, req)
+}
+func (c *Client) GetFileStatusWithContext(ctx context.Context, req *GetFileStatusRequest) (*GetFileStatusResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.getFileStatus(ctx, req)
+}
+func (c *Client) getFileStatus(ctx context.Context, req *GetFileStatusRequest) (*GetFileStatusResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -95,6 +105,9 @@ func (c *Client) GetFileStatus(req *GetFileStatusRequest) (*GetFileStatusRespons
 		}
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
 		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {

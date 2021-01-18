@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -86,6 +87,15 @@ func (resp *CheckAccessResponse) UnmarshalHTTP(httpResp *http.Response) error {
 // Check access
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Check_access
 func (c *Client) CheckAccess(req *CheckAccessRequest) (*CheckAccessResponse, error) {
+	return c.checkAccess(nil, req)
+}
+func (c *Client) CheckAccessWithContext(ctx context.Context, req *CheckAccessRequest) (*CheckAccessResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.checkAccess(ctx, req)
+}
+func (c *Client) checkAccess(ctx context.Context, req *CheckAccessRequest) (*CheckAccessResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -107,6 +117,9 @@ func (c *Client) CheckAccess(req *CheckAccessRequest) (*CheckAccessResponse, err
 		}
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
 		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {

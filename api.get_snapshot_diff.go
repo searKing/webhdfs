@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -90,6 +91,15 @@ func (resp *GetSnapshotDiffResponse) UnmarshalHTTP(httpResp *http.Response) erro
 // Get Snapshot Diff
 // See also: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Get_Snapshot_Diff
 func (c *Client) GetSnapshotDiff(req *GetSnapshotDiffRequest) (*GetSnapshotDiffResponse, error) {
+	return c.getSnapshotDiff(nil, req)
+}
+func (c *Client) GetSnapshotDiffWithContext(ctx context.Context, req *GetSnapshotDiffRequest) (*GetSnapshotDiffResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.getSnapshotDiff(ctx, req)
+}
+func (c *Client) getSnapshotDiff(ctx context.Context, req *GetSnapshotDiffRequest) (*GetSnapshotDiffResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -111,6 +121,9 @@ func (c *Client) GetSnapshotDiff(req *GetSnapshotDiffRequest) (*GetSnapshotDiffR
 		}
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
 		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {

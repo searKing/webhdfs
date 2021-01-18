@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -148,6 +149,15 @@ func (resp *CreateResponse) UnmarshalHTTP(httpResp *http.Response) error {
 // No umask mode will be applied from server side (so “fs.permissions.umask-mode” value configuration set on Namenode side will have no effect).
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Create_and_Write_to_a_File
 func (c *Client) Create(req *CreateRequest) (*CreateResponse, error) {
+	return c.create(nil, req)
+}
+func (c *Client) CreateWithContext(ctx context.Context, req *CreateRequest) (*CreateResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.create(ctx, req)
+}
+func (c *Client) create(ctx context.Context, req *CreateRequest) (*CreateResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -171,6 +181,9 @@ func (c *Client) Create(req *CreateRequest) (*CreateResponse, error) {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
+		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)

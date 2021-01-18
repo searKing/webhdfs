@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -121,6 +122,17 @@ func (resp *OpenResponse) UnmarshalHTTP(httpResp *http.Response) error {
 // Open and Read a File
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Open_and_Read_a_File
 func (c *Client) Open(req *OpenRequest) (*OpenResponse, error) {
+	return c.open(nil, req)
+}
+
+func (c *Client) OpenWithContext(ctx context.Context, req *OpenRequest) (*OpenResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.open(ctx, req)
+}
+
+func (c *Client) open(ctx context.Context, req *OpenRequest) (*OpenResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -142,6 +154,9 @@ func (c *Client) Open(req *OpenRequest) (*OpenResponse, error) {
 		}
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
 		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {

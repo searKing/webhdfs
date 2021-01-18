@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -101,6 +102,15 @@ func (resp *GetDelegationTokenResponse) UnmarshalHTTP(httpResp *http.Response) e
 // expire time set by server "dfs.namenode.delegation.token.max-lifetime"
 // See: https://hadoop.apache.org/docs/r2.7.1/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml#dfs.namenode.delegation.token.max-lifetime
 func (c *Client) GetDelegationToken(req *GetDelegationTokenRequest) (*GetDelegationTokenResponse, error) {
+	return c.getDelegationToken(nil, req)
+}
+func (c *Client) GetDelegationTokenWithContext(ctx context.Context, req *GetDelegationTokenRequest) (*GetDelegationTokenResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.getDelegationToken(ctx, req)
+}
+func (c *Client) getDelegationToken(ctx context.Context, req *GetDelegationTokenRequest) (*GetDelegationTokenResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -122,6 +132,9 @@ func (c *Client) GetDelegationToken(req *GetDelegationTokenRequest) (*GetDelegat
 		}
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
 		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {

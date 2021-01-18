@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -76,6 +77,15 @@ func (resp *UnsetStoragePolicyResponse) UnmarshalHTTP(httpResp *http.Response) e
 // Unset Storage Policy
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Unset_Storage_Policy
 func (c *Client) UnsetStoragePolicy(req *UnsetStoragePolicyRequest) (*UnsetStoragePolicyResponse, error) {
+	return c.unsetStoragePolicy(nil, req)
+}
+func (c *Client) UnsetStoragePolicyWithContext(ctx context.Context, req *UnsetStoragePolicyRequest) (*UnsetStoragePolicyResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.unsetStoragePolicy(ctx, req)
+}
+func (c *Client) unsetStoragePolicy(ctx context.Context, req *UnsetStoragePolicyRequest) (*UnsetStoragePolicyResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -99,6 +109,9 @@ func (c *Client) UnsetStoragePolicy(req *UnsetStoragePolicyRequest) (*UnsetStora
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
+		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)

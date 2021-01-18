@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -74,6 +75,15 @@ func (resp *GetQuotaUsageResponse) UnmarshalHTTP(httpResp *http.Response) error 
 // Get Quota Usage of a Directory
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Get_Quota_Usage_of_a_Directory
 func (c *Client) GetQuotaUsage(req *GetQuotaUsageRequest) (*GetQuotaUsageResponse, error) {
+	return c.getQuotaUsage(nil, req)
+}
+func (c *Client) GetQuotaUsageWithContext(ctx context.Context, req *GetQuotaUsageRequest) (*GetQuotaUsageResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.getQuotaUsage(ctx, req)
+}
+func (c *Client) getQuotaUsage(ctx context.Context, req *GetQuotaUsageRequest) (*GetQuotaUsageResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -95,6 +105,9 @@ func (c *Client) GetQuotaUsage(req *GetQuotaUsageRequest) (*GetQuotaUsageRespons
 		}
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
 		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {

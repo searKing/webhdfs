@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -82,6 +83,15 @@ func (resp *DeleteSnapshotResponse) UnmarshalHTTP(httpResp *http.Response) error
 // Delete Snapshot
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Delete_Snapshot
 func (c *Client) DeleteSnapshot(req *DeleteSnapshotRequest) (*DeleteSnapshotResponse, error) {
+	return c.deleteSnapshot(nil, req)
+}
+func (c *Client) DeleteSnapshotWithContext(ctx context.Context, req *DeleteSnapshotRequest) (*DeleteSnapshotResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.deleteSnapshot(ctx, req)
+}
+func (c *Client) deleteSnapshot(ctx context.Context, req *DeleteSnapshotRequest) (*DeleteSnapshotResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -105,6 +115,9 @@ func (c *Client) DeleteSnapshot(req *DeleteSnapshotRequest) (*DeleteSnapshotResp
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
+		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)

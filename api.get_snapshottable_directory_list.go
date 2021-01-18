@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -81,6 +82,15 @@ func (resp *GetSnapshottableDirectoryListResponse) UnmarshalHTTP(httpResp *http.
 // If the USER is the hdfs super user, the call lists all the snapshottable directories.
 // See also: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Get_Snapshottable_Directory_List
 func (c *Client) GetSnapshottableDirectoryList(req *GetSnapshottableDirectoryListRequest) (*GetSnapshottableDirectoryListResponse, error) {
+	return c.getSnapshottableDirectoryList(nil, req)
+}
+func (c *Client) GetSnapshottableDirectoryListWithContext(ctx context.Context, req *GetSnapshottableDirectoryListRequest) (*GetSnapshottableDirectoryListResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.getSnapshottableDirectoryList(ctx, req)
+}
+func (c *Client) getSnapshottableDirectoryList(ctx context.Context, req *GetSnapshottableDirectoryListRequest) (*GetSnapshottableDirectoryListResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -102,6 +112,9 @@ func (c *Client) GetSnapshottableDirectoryList(req *GetSnapshottableDirectoryLis
 		}
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
 		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {

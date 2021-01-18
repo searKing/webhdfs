@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -85,6 +86,15 @@ func (resp *MkdirsResponse) UnmarshalHTTP(httpResp *http.Response) error {
 // No umask mode will be applied from server side (so “fs.permissions.umask-mode” value configuration set on Namenode side will have no effect).
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Make_a_Directory
 func (c *Client) Mkdirs(req *MkdirsRequest) (*MkdirsResponse, error) {
+	return c.mkdirs(nil, req)
+}
+func (c *Client) MkdirsWithContext(ctx context.Context, req *MkdirsRequest) (*MkdirsResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.mkdirs(ctx, req)
+}
+func (c *Client) mkdirs(ctx context.Context, req *MkdirsRequest) (*MkdirsResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -108,6 +118,9 @@ func (c *Client) Mkdirs(req *MkdirsRequest) (*MkdirsResponse, error) {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
+		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)

@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -15,7 +16,6 @@ type GetStoragePolicyRequest struct {
 	Authentication
 	ProxyUser
 	CSRF
-
 }
 
 type GetStoragePolicyResponse struct {
@@ -69,6 +69,15 @@ func (resp *GetStoragePolicyResponse) UnmarshalHTTP(httpResp *http.Response) err
 // Get Storage Policy
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Get_Storage_Policy
 func (c *Client) GetStoragePolicy(req *GetStoragePolicyRequest) (*GetStoragePolicyResponse, error) {
+	return c.getStoragePolicy(nil, req)
+}
+func (c *Client) GetStoragePolicyWithContext(ctx context.Context, req *GetStoragePolicyRequest) (*GetStoragePolicyResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.getStoragePolicy(ctx, req)
+}
+func (c *Client) getStoragePolicy(ctx context.Context, req *GetStoragePolicyRequest) (*GetStoragePolicyResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -90,6 +99,9 @@ func (c *Client) GetStoragePolicy(req *GetStoragePolicyRequest) (*GetStoragePoli
 		}
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
 		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {

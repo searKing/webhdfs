@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -80,6 +81,15 @@ func (resp *ListStatusBatchResponse) UnmarshalHTTP(httpResp *http.Response) erro
 // To query the next batch, set the startAfter parameter to the pathSuffix of the last item returned in the current batch.
 // Batch size is controlled by the dfs.ls.limit option on the NameNode.
 func (c *Client) ListStatusBatch(req *ListStatusBatchRequest) (*ListStatusBatchResponse, error) {
+	return c.listStatusBatch(nil, req)
+}
+func (c *Client) ListStatusBatchWithContext(ctx context.Context, req *ListStatusBatchRequest) (*ListStatusBatchResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.listStatusBatch(ctx, req)
+}
+func (c *Client) listStatusBatch(ctx context.Context, req *ListStatusBatchRequest) (*ListStatusBatchResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -101,6 +111,9 @@ func (c *Client) ListStatusBatch(req *ListStatusBatchRequest) (*ListStatusBatchR
 		}
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
 		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {

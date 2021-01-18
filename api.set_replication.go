@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -83,6 +84,15 @@ func (resp *SetReplicationResponse) UnmarshalHTTP(httpResp *http.Response) error
 // Replication
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Replication
 func (c *Client) SetReplication(req *SetReplicationRequest) (*SetReplicationResponse, error) {
+	return c.setReplication(nil, req)
+}
+func (c *Client) SetReplicationWithContext(ctx context.Context, req *SetReplicationRequest) (*SetReplicationResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.setReplication(ctx, req)
+}
+func (c *Client) setReplication(ctx context.Context, req *SetReplicationRequest) (*SetReplicationResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -106,6 +116,9 @@ func (c *Client) SetReplication(req *SetReplicationRequest) (*SetReplicationResp
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
+		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)

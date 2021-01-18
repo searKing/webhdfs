@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -88,6 +89,15 @@ func (resp *GetXAttrsResponse) UnmarshalHTTP(httpResp *http.Response) error {
 // Get multiple XAttrs
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Get_multiple_XAttrs
 func (c *Client) GetXAttrs(req *GetXAttrsRequest) (*GetXAttrsResponse, error) {
+	return c.getXAttrs(nil, req)
+}
+func (c *Client) GetXAttrsWithContext(ctx context.Context, req *GetXAttrsRequest) (*GetXAttrsResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.getXAttrs(ctx, req)
+}
+func (c *Client) getXAttrs(ctx context.Context, req *GetXAttrsRequest) (*GetXAttrsResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -112,6 +122,9 @@ func (c *Client) GetXAttrs(req *GetXAttrsRequest) (*GetXAttrsResponse, error) {
 		}
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
 		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {

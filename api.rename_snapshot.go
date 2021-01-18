@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -96,6 +97,15 @@ func (resp *RenameSnapshotResponse) UnmarshalHTTP(httpResp *http.Response) error
 // Create Snapshot
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Create_Snapshot
 func (c *Client) RenameSnapshot(req *RenameSnapshotRequest) (*RenameSnapshotResponse, error) {
+	return c.renameSnapshot(nil, req)
+}
+func (c *Client) RenameSnapshotWithContext(ctx context.Context, req *RenameSnapshotRequest) (*RenameSnapshotResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.renameSnapshot(ctx, req)
+}
+func (c *Client) renameSnapshot(ctx context.Context, req *RenameSnapshotRequest) (*RenameSnapshotResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -119,6 +129,9 @@ func (c *Client) RenameSnapshot(req *RenameSnapshotRequest) (*RenameSnapshotResp
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
+		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)

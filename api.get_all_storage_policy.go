@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -68,6 +69,15 @@ func (resp *GetAllStoragePolicyResponse) UnmarshalHTTP(httpResp *http.Response) 
 // Get all Storage Policies
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Get_all_Storage_Policies
 func (c *Client) GetAllStoragePolicy(req *GetAllStoragePolicyRequest) (*GetAllStoragePolicyResponse, error) {
+	return c.getAllStoragePolicy(nil, req)
+}
+func (c *Client) GetAllStoragePolicyWithContext(ctx context.Context, req *GetAllStoragePolicyRequest) (*GetAllStoragePolicyResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.getAllStoragePolicy(ctx, req)
+}
+func (c *Client) getAllStoragePolicy(ctx context.Context, req *GetAllStoragePolicyRequest) (*GetAllStoragePolicyResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -89,6 +99,9 @@ func (c *Client) GetAllStoragePolicy(req *GetAllStoragePolicyRequest) (*GetAllSt
 		}
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
 		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {

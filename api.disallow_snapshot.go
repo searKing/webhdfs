@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -76,6 +77,15 @@ func (resp *DisallowSnapshotResponse) UnmarshalHTTP(httpResp *http.Response) err
 // expire time set by server "dfs.namenode.delegation.token.max-lifetime"
 // See: https://hadoop.apache.org/docs/r2.7.1/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml#dfs.namenode.delegation.token.max-lifetime
 func (c *Client) DisallowSnapshot(req *DisallowSnapshotRequest) (*DisallowSnapshotResponse, error) {
+	return c.disallowSnapshot(nil, req)
+}
+func (c *Client) DisallowSnapshotWithContext(ctx context.Context, req *DisallowSnapshotRequest) (*DisallowSnapshotResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.disallowSnapshot(ctx, req)
+}
+func (c *Client) disallowSnapshot(ctx context.Context, req *DisallowSnapshotRequest) (*DisallowSnapshotResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -99,6 +109,9 @@ func (c *Client) DisallowSnapshot(req *DisallowSnapshotRequest) (*DisallowSnapsh
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
+		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)

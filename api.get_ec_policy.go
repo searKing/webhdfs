@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -74,6 +75,15 @@ func (resp *GetECPolicyResponse) UnmarshalHTTP(httpResp *http.Response) error {
 // Get EC Policy
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Get_EC_Policy
 func (c *Client) GetECPolicy(req *GetECPolicyRequest) (*GetECPolicyResponse, error) {
+	return c.getECPolicy(nil, req)
+}
+func (c *Client) GetECPolicyWithContext(ctx context.Context, req *GetECPolicyRequest) (*GetECPolicyResponse, error) {
+	if ctx == nil {
+		panic("nil context")
+	}
+	return c.getECPolicy(ctx, req)
+}
+func (c *Client) getECPolicy(ctx context.Context, req *GetECPolicyRequest) (*GetECPolicyResponse, error) {
 	err := c.opts.Validator.Struct(req)
 	if err != nil {
 		return nil, err
@@ -95,6 +105,9 @@ func (c *Client) GetECPolicy(req *GetECPolicyRequest) (*GetECPolicyResponse, err
 		}
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+		if ctx != nil {
+			httpReq = httpReq.WithContext(ctx)
 		}
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
