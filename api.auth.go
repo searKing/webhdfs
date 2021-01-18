@@ -23,3 +23,14 @@ type Authentication struct {
 	// see encodeToUrlString() and decodeFromUrlString(String) in org.apache.hadoop.security.token.Token for the details of the encoding.
 	Delegation *string
 }
+
+// addr is a valid namenode
+func (c *Client) UrlString(addr string, req Request) (string, error) {
+	err := c.opts.Validator.Struct(req)
+	if err != nil {
+		return "", err
+	}
+	var u = c.HttpUrl(req)
+	u.Host = addr
+	return u.String(), nil
+}

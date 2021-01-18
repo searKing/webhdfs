@@ -37,10 +37,12 @@ func (c *Client) HttpSchema() string {
 	return "https"
 }
 
-func (c *Client) HttpUrl(query interface {
+type Request interface {
 	RawPath() string
 	RawQuery() string
-}) url.URL {
+}
+
+func (c *Client) HttpUrl(query Request) url.URL {
 	return url.URL{
 		Scheme:   c.HttpSchema(),
 		Path:     path.Join(PathPrefix, query.RawPath()),
