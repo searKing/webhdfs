@@ -15,6 +15,7 @@ import (
 
 type CreateRequest struct {
 	ProxyUser
+	CSRF
 
 	// Path of the object to get.
 	//
@@ -164,6 +165,9 @@ func (c *Client) Create(req *CreateRequest) (*CreateResponse, error) {
 		httpReq, err := http.NewRequest(http.MethodPut, u.String(), req.Body)
 		if err != nil {
 			return nil, err
+		}
+		if req.CSRF.XXsrfHeader != nil {
+			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
 		httpResp, err := c.httpClient.Do(httpReq)

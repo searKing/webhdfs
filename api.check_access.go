@@ -14,6 +14,7 @@ import (
 
 type CheckAccessRequest struct {
 	ProxyUser
+	CSRF
 
 	// Path of the object to get.
 	//
@@ -98,7 +99,15 @@ func (c *Client) CheckAccess(req *CheckAccessRequest) (*CheckAccessResponse, err
 	var errs []error
 	for _, addr := range nameNodes {
 		u.Host = addr
-		httpResp, err := c.httpClient.Get(u.String())
+		httpReq, err := http.NewRequest(http.MethodGet, u.String(), nil)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		if req.CSRF.XXsrfHeader != nil {
+			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)
 			continue

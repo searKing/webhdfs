@@ -14,6 +14,7 @@ import (
 
 type DisableECPolicyRequest struct {
 	ProxyUser
+	CSRF
 
 	// Name				ecpolicy, Erasure Coding Policy
 	// Description		The name of the erasure coding policy.
@@ -98,6 +99,9 @@ func (c *Client) DisableECPolicy(req *DisableECPolicyRequest) (*DisableECPolicyR
 		httpReq, err := http.NewRequest(http.MethodPut, u.String(), nil)
 		if err != nil {
 			return nil, err
+		}
+		if req.CSRF.XXsrfHeader != nil {
+			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
 		httpResp, err := c.httpClient.Do(httpReq)

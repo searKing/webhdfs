@@ -14,6 +14,7 @@ import (
 
 type DeleteSnapshotRequest struct {
 	ProxyUser
+	CSRF
 
 	// Path of the object to get.
 	//
@@ -98,6 +99,9 @@ func (c *Client) DeleteSnapshot(req *DeleteSnapshotRequest) (*DeleteSnapshotResp
 		httpReq, err := http.NewRequest(http.MethodDelete, u.String(), nil)
 		if err != nil {
 			return nil, err
+		}
+		if req.CSRF.XXsrfHeader != nil {
+			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
 		httpResp, err := c.httpClient.Do(httpReq)

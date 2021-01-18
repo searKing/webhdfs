@@ -14,6 +14,7 @@ import (
 
 type SetPermissionRequest struct {
 	ProxyUser
+	CSRF
 
 	// Path of the object to get.
 	//
@@ -112,6 +113,9 @@ func (c *Client) SetPermission(req *SetPermissionRequest) (*SetPermissionRespons
 		httpReq, err := http.NewRequest(http.MethodPut, u.String(), nil)
 		if err != nil {
 			return nil, err
+		}
+		if req.CSRF.XXsrfHeader != nil {
+			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
 		httpResp, err := c.httpClient.Do(httpReq)

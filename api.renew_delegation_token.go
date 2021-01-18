@@ -14,6 +14,7 @@ import (
 
 type RenewDelegationTokenRequest struct {
 	ProxyUser
+	CSRF
 
 	// Name				token
 	// Description		The delegation token used for the operation.
@@ -96,6 +97,9 @@ func (c *Client) RenewDelegationToken(req *RenewDelegationTokenRequest) (*RenewD
 		httpReq, err := http.NewRequest(http.MethodPut, u.String(), nil)
 		if err != nil {
 			return nil, err
+		}
+		if req.CSRF.XXsrfHeader != nil {
+			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
 		httpResp, err := c.httpClient.Do(httpReq)

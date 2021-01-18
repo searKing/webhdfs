@@ -14,6 +14,7 @@ import (
 
 type GetFileBlockLocationsRequest struct {
 	ProxyUser
+	CSRF
 
 	// Path of the object to get.
 	//
@@ -24,7 +25,7 @@ type GetFileBlockLocationsRequest struct {
 type GetFileBlockLocationsResponse struct {
 	NameNode string `json:"-"`
 	ErrorResponse
-	HttpResponse `json:"-"`
+	HttpResponse   `json:"-"`
 	BlockLocations BlockLocations `json:"BlockLocations"`
 }
 
@@ -86,7 +87,15 @@ func (c *Client) GetFileBlockLocations(req *GetFileBlockLocationsRequest) (*GetF
 	var errs []error
 	for _, addr := range nameNodes {
 		u.Host = addr
-		httpResp, err := c.httpClient.Get(u.String())
+		httpReq, err := http.NewRequest(http.MethodGet, u.String(), nil)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		if req.CSRF.XXsrfHeader != nil {
+			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)
 			continue

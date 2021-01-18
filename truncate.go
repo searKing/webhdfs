@@ -14,6 +14,7 @@ import (
 
 type TruncateRequest struct {
 	ProxyUser
+	CSRF
 
 	// Path of the object to get.
 	//
@@ -103,6 +104,9 @@ func (c *Client) Truncate(req *TruncateRequest) (*TruncateResponse, error) {
 		httpReq, err := http.NewRequest(http.MethodPost, u.String(), nil)
 		if err != nil {
 			return nil, err
+		}
+		if req.CSRF.XXsrfHeader != nil {
+			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 
 		httpResp, err := c.httpClient.Do(httpReq)
