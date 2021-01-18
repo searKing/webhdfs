@@ -7,10 +7,13 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/searKing/golang/go/errors"
 )
 
 type GetAllStoragePolicyRequest struct {
+	ProxyUser
+
 }
 
 type GetAllStoragePolicyResponse struct {
@@ -26,6 +29,16 @@ func (req *GetAllStoragePolicyRequest) RawPath() string {
 func (req *GetAllStoragePolicyRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpGetAllStoragePolicy)
+	if req.ProxyUser.Username != nil {
+		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+	}
+	if req.ProxyUser.DoAs != nil {
+		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+	}
+	if req.ProxyUser.Delegation != nil {
+		v.Set("delegation", aws.StringValue(req.ProxyUser.Delegation))
+	}
+
 	return v.Encode()
 }
 

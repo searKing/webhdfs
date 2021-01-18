@@ -13,6 +13,8 @@ import (
 )
 
 type DeleteSnapshotRequest struct {
+	ProxyUser
+
 	// Path of the object to get.
 	//
 	// Path is a required field
@@ -39,6 +41,16 @@ func (req *DeleteSnapshotRequest) RawPath() string {
 func (req *DeleteSnapshotRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpDeleteSnapshot)
+	if req.ProxyUser.Username != nil {
+		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+	}
+	if req.ProxyUser.DoAs != nil {
+		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+	}
+	if req.ProxyUser.Delegation != nil {
+		v.Set("delegation", aws.StringValue(req.ProxyUser.Delegation))
+	}
+
 	if req.Snapshotname != nil {
 		v.Set("snapshotname", aws.StringValue(req.Snapshotname))
 	}

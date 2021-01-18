@@ -13,6 +13,8 @@ import (
 )
 
 type GetSnapshotDiffRequest struct {
+	ProxyUser
+
 	// Name				oldsnapshotname
 	// Description		The old name of the snapshot to be renamed.
 	// Type				String
@@ -44,6 +46,16 @@ func (req *GetSnapshotDiffRequest) RawPath() string {
 func (req *GetSnapshotDiffRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpGetSnapshotDiff)
+	if req.ProxyUser.Username != nil {
+		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+	}
+	if req.ProxyUser.DoAs != nil {
+		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+	}
+	if req.ProxyUser.Delegation != nil {
+		v.Set("delegation", aws.StringValue(req.ProxyUser.Delegation))
+	}
+
 	if req.Oldsnapshotname != nil {
 		v.Set("oldsnapshotname", aws.StringValue(req.Oldsnapshotname))
 	}

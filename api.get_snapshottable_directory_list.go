@@ -13,6 +13,8 @@ import (
 )
 
 type GetSnapshottableDirectoryListRequest struct {
+	ProxyUser
+
 	// Name				user.name
 	// Description		The authenticated user; see Authentication.
 	// Type				String
@@ -36,6 +38,16 @@ func (req *GetSnapshottableDirectoryListRequest) RawPath() string {
 func (req *GetSnapshottableDirectoryListRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpGetSnapshottableDirectoryList)
+	if req.ProxyUser.Username != nil {
+		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+	}
+	if req.ProxyUser.DoAs != nil {
+		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+	}
+	if req.ProxyUser.Delegation != nil {
+		v.Set("delegation", aws.StringValue(req.ProxyUser.Delegation))
+	}
+
 	if req.Username != nil {
 		v.Set("user.name", aws.StringValue(req.Username))
 	}

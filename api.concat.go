@@ -13,6 +13,8 @@ import (
 )
 
 type ConcatRequest struct {
+	ProxyUser
+
 	// Path of the object to get.
 	//
 	// Path is a required field
@@ -39,6 +41,16 @@ func (req *ConcatRequest) RawPath() string {
 func (req *ConcatRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpConcat)
+	if req.ProxyUser.Username != nil {
+		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+	}
+	if req.ProxyUser.DoAs != nil {
+		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+	}
+	if req.ProxyUser.Delegation != nil {
+		v.Set("delegation", aws.StringValue(req.ProxyUser.Delegation))
+	}
+
 	if req.Sources != nil {
 		v.Set("sources", aws.StringValue(req.Sources))
 	}

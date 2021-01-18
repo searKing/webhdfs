@@ -13,6 +13,8 @@ import (
 )
 
 type TruncateRequest struct {
+	ProxyUser
+
 	// Path of the object to get.
 	//
 	// Path is a required field
@@ -40,6 +42,16 @@ func (req *TruncateRequest) RawPath() string {
 func (req *TruncateRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpTruncate)
+	if req.ProxyUser.Username != nil {
+		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+	}
+	if req.ProxyUser.DoAs != nil {
+		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+	}
+	if req.ProxyUser.Delegation != nil {
+		v.Set("delegation", aws.StringValue(req.ProxyUser.Delegation))
+	}
+
 	if req.NewLength != nil {
 		v.Set("newlength", fmt.Sprintf("%d", aws.Int64Value(req.NewLength)))
 	}

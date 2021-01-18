@@ -14,6 +14,8 @@ import (
 
 // See also: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Get_Delegation_Token
 type GetDelegationTokenRequest struct {
+	ProxyUser
+
 	// Name				renewer
 	// Description		The username of the renewer of a delegation token.
 	// Type				String
@@ -50,6 +52,16 @@ func (req *GetDelegationTokenRequest) RawPath() string {
 func (req *GetDelegationTokenRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpGetDelegationToken)
+	if req.ProxyUser.Username != nil {
+		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+	}
+	if req.ProxyUser.DoAs != nil {
+		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+	}
+	if req.ProxyUser.Delegation != nil {
+		v.Set("delegation", aws.StringValue(req.ProxyUser.Delegation))
+	}
+
 	if req.Renewer != nil {
 		v.Set("renewer", aws.StringValue(req.Renewer))
 	}

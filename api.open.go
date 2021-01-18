@@ -13,6 +13,8 @@ import (
 )
 
 type OpenRequest struct {
+	ProxyUser
+
 	// Path of the object to get.
 	//
 	// Path is a required field
@@ -63,6 +65,16 @@ func (req *OpenRequest) RawPath() string {
 func (req *OpenRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpOpen)
+	if req.ProxyUser.Username != nil {
+		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+	}
+	if req.ProxyUser.DoAs != nil {
+		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+	}
+	if req.ProxyUser.Delegation != nil {
+		v.Set("delegation", aws.StringValue(req.ProxyUser.Delegation))
+	}
+
 	if req.Offset != nil {
 		v.Set("offset", fmt.Sprintf("%d", aws.Int64Value(req.Offset)))
 	}

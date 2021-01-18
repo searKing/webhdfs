@@ -13,6 +13,8 @@ import (
 )
 
 type ListStatusBatchRequest struct {
+	ProxyUser
+
 	// Path of the object to get.
 	//
 	// Path is a required field
@@ -35,6 +37,16 @@ func (req *ListStatusBatchRequest) RawPath() string {
 func (req *ListStatusBatchRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpListStatusBatch)
+	if req.ProxyUser.Username != nil {
+		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+	}
+	if req.ProxyUser.DoAs != nil {
+		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+	}
+	if req.ProxyUser.Delegation != nil {
+		v.Set("delegation", aws.StringValue(req.ProxyUser.Delegation))
+	}
+
 	return v.Encode()
 }
 

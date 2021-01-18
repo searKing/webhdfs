@@ -13,6 +13,8 @@ import (
 )
 
 type DisableECPolicyRequest struct {
+	ProxyUser
+
 	// Name				ecpolicy, Erasure Coding Policy
 	// Description		The name of the erasure coding policy.
 	// Type				String
@@ -34,6 +36,16 @@ func (req *DisableECPolicyRequest) RawPath() string {
 func (req *DisableECPolicyRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpDisableECPolicy)
+	if req.ProxyUser.Username != nil {
+		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+	}
+	if req.ProxyUser.DoAs != nil {
+		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+	}
+	if req.ProxyUser.Delegation != nil {
+		v.Set("delegation", aws.StringValue(req.ProxyUser.Delegation))
+	}
+
 	if req.ECPolicy != nil {
 		v.Set("ecpolicy", aws.StringValue(req.ECPolicy))
 	}

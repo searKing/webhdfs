@@ -14,6 +14,8 @@ import (
 )
 
 type AppendRequest struct {
+	ProxyUser
+
 	// Path of the object to get.
 	//
 	// Path is a required field
@@ -53,6 +55,16 @@ func (req *AppendRequest) RawPath() string {
 func (req *AppendRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpAppend)
+	if req.ProxyUser.Username != nil {
+		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+	}
+	if req.ProxyUser.DoAs != nil {
+		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+	}
+	if req.ProxyUser.Delegation != nil {
+		v.Set("delegation", aws.StringValue(req.ProxyUser.Delegation))
+	}
+
 	if req.BufferSize != nil {
 		v.Set("buffersize", fmt.Sprintf("%d", aws.IntValue(req.BufferSize)))
 	}

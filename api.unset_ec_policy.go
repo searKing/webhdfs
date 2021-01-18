@@ -13,6 +13,8 @@ import (
 )
 
 type UnsetECPolicyRequest struct {
+	ProxyUser
+
 	// Path of the object to get.
 	//
 	// Path is a required field
@@ -31,6 +33,16 @@ func (req *UnsetECPolicyRequest) RawPath() string {
 func (req *UnsetECPolicyRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpUnsetECPolicy)
+	if req.ProxyUser.Username != nil {
+		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+	}
+	if req.ProxyUser.DoAs != nil {
+		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+	}
+	if req.ProxyUser.Delegation != nil {
+		v.Set("delegation", aws.StringValue(req.ProxyUser.Delegation))
+	}
+
 	return v.Encode()
 }
 

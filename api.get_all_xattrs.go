@@ -13,6 +13,8 @@ import (
 )
 
 type GetAllXAttrsRequest struct {
+	ProxyUser
+
 	// Path of the object to get.
 	//
 	// Path is a required field
@@ -38,6 +40,16 @@ func (req *GetAllXAttrsRequest) RawPath() string {
 func (req *GetAllXAttrsRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpGetAllXAttrs)
+	if req.ProxyUser.Username != nil {
+		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+	}
+	if req.ProxyUser.DoAs != nil {
+		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+	}
+	if req.ProxyUser.Delegation != nil {
+		v.Set("delegation", aws.StringValue(req.ProxyUser.Delegation))
+	}
+
 	if req.Encoding != nil {
 		v.Set(HttpQueryParamKeyXAttrValueEncoding, aws.StringValue((*string)(req.Encoding)))
 	}

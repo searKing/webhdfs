@@ -13,6 +13,8 @@ import (
 )
 
 type SetXAttrRequest struct {
+	ProxyUser
+
 	// Path of the object to get.
 	//
 	// Path is a required field
@@ -53,6 +55,16 @@ func (req *SetXAttrRequest) RawPath() string {
 func (req *SetXAttrRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpSetXAttr)
+	if req.ProxyUser.Username != nil {
+		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+	}
+	if req.ProxyUser.DoAs != nil {
+		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+	}
+	if req.ProxyUser.Delegation != nil {
+		v.Set("delegation", aws.StringValue(req.ProxyUser.Delegation))
+	}
+
 	if req.XAttrName != nil {
 		v.Set("xattr.name", aws.StringValue(req.XAttrName))
 	}

@@ -13,6 +13,8 @@ import (
 )
 
 type RenewDelegationTokenRequest struct {
+	ProxyUser
+
 	// Name				token
 	// Description		The delegation token used for the operation.
 	// Type				String
@@ -35,6 +37,16 @@ func (req *RenewDelegationTokenRequest) RawPath() string {
 func (req *RenewDelegationTokenRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpRenewDelegationToken)
+	if req.ProxyUser.Username != nil {
+		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+	}
+	if req.ProxyUser.DoAs != nil {
+		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+	}
+	if req.ProxyUser.Delegation != nil {
+		v.Set("delegation", aws.StringValue(req.ProxyUser.Delegation))
+	}
+
 	if req.Token != nil {
 		v.Set("token", aws.StringValue(req.Token))
 	}
