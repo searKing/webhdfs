@@ -2,7 +2,9 @@ package webhdfs
 
 import (
 	"fmt"
+	"os"
 	"strings"
+	"syscall"
 
 	"github.com/searKing/golang/go/time"
 )
@@ -125,7 +127,7 @@ type RemoteException struct {
 
 // Error returns the string representation of the error.
 // Satisfies the error interface.
-func (e RemoteException) Error() string {
+func (e *RemoteException) Error() string {
 	var msg strings.Builder
 	msg.WriteString(e.Exception)
 	if e.Message != "" {
@@ -135,6 +137,31 @@ func (e RemoteException) Error() string {
 		msg.WriteString(fmt.Sprintf(" in %s", e.JavaClassName))
 	}
 	return msg.String()
+}
+
+const (
+	JavaClassNameFileNotFoundException            = "java.io.FileNotFoundException"
+	JavaClassNameAccessControlException           = "org.apache.hadoop.security.AccessControlException"
+	JavaClassNamePathIsNotEmptyDirectoryException = "org.apache.hadoop.fs.PathIsNotEmptyDirectoryException"
+	JavaClassNameFileAlreadyExistsException       = "org.apache.hadoop.fs.FileAlreadyExistsException"
+	JavaClassNameAlreadyBeingCreatedException     = "org.apache.hadoop.hdfs.protocol.AlreadyBeingCreatedException"
+)
+
+func (e *RemoteException) Unwrap() error {
+	switch e.JavaClassName {
+	case JavaClassNameFileNotFoundException:
+		return os.ErrNotExist
+	case JavaClassNameAccessControlException:
+		return os.ErrPermission
+	case JavaClassNamePathIsNotEmptyDirectoryException:
+		return syscall.ENOTEMPTY
+	case JavaClassNameFileAlreadyExistsException:
+		return os.ErrExist
+	case JavaClassNameAlreadyBeingCreatedException:
+		return os.ErrExist
+	default:
+		return fmt.Errorf("%s", e.Error())
+	}
 }
 
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Token_JSON_Schema
