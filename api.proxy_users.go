@@ -18,14 +18,6 @@ type ProxyUser struct {
 	// Syntax			Any string.
 	DoAs *string
 
-	// Delegation
-	// Name				delegation
-	// Description		The delegation token used for authentication.
-	// Type				String
-	// Default Value	<empty>
-	// Valid Values		An encoded token.
-	// Syntax		See the note below.
-	// Note that delegation tokens are encoded as a URL safe string;
-	// see encodeToUrlString() and decodeFromUrlString(String) in org.apache.hadoop.security.token.Token for the details of the encoding.
-	Delegation *string
+	// Set by Delegation in struct Authentication
+	// Delegation *string
 }

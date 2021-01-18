@@ -13,6 +13,7 @@ import (
 )
 
 type CheckAccessRequest struct {
+	Authentication
 	ProxyUser
 	CSRF
 
@@ -44,14 +45,14 @@ func (req *CheckAccessRequest) RawPath() string {
 func (req *CheckAccessRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpCheckAccess)
+	if req.Authentication.Delegation != nil {
+		v.Set("delegation", aws.StringValue(req.Authentication.Delegation))
+	}
 	if req.ProxyUser.Username != nil {
 		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
 	}
 	if req.ProxyUser.DoAs != nil {
 		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
-	}
-	if req.ProxyUser.Delegation != nil {
-		v.Set("delegation", aws.StringValue(req.ProxyUser.Delegation))
 	}
 
 	return v.Encode()

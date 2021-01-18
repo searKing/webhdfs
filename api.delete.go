@@ -13,6 +13,7 @@ import (
 )
 
 type DeleteRequest struct {
+	Authentication
 	ProxyUser
 	CSRF
 
@@ -44,14 +45,14 @@ func (req *DeleteRequest) RawPath() string {
 func (req *DeleteRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpDelete)
+	if req.Authentication.Delegation != nil {
+		v.Set("delegation", aws.StringValue(req.Authentication.Delegation))
+	}
 	if req.ProxyUser.Username != nil {
 		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
 	}
 	if req.ProxyUser.DoAs != nil {
 		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
-	}
-	if req.ProxyUser.Delegation != nil {
-		v.Set("delegation", aws.StringValue(req.ProxyUser.Delegation))
 	}
 
 	if req.Recursive != nil {
