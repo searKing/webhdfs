@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	"github.com/aws/aws-sdk-go/aws"
+	strings_ "github.com/searKing/golang/go/strings"
 
 	"github.com/searKing/golang/go/errors"
 )
@@ -76,7 +77,7 @@ func (resp *ConcatResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse %s: %w", strings_.Truncate(string(body), MaxHTTPBodyLengthDumped), err)
 	}
 	if err := resp.Exception(); err != nil {
 		return err

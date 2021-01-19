@@ -3,6 +3,11 @@ package webhdfs
 const (
 	PathPrefix = "/webhdfs/v1/"
 )
+
+var (
+	MaxHTTPBodyLengthDumped = 100
+)
+
 const (
 	OpOpen                          = "OPEN"
 	OpGetFileStatus                 = "GETFILESTATUS"

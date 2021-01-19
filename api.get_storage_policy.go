@@ -10,6 +10,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/searKing/golang/go/errors"
+	strings_ "github.com/searKing/golang/go/strings"
 )
 
 type GetStoragePolicyRequest struct {
@@ -57,7 +58,7 @@ func (resp *GetStoragePolicyResponse) UnmarshalHTTP(httpResp *http.Response) err
 	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse %s: %w", strings_.Truncate(string(body), MaxHTTPBodyLengthDumped), err)
 	}
 
 	if err := resp.Exception(); err != nil {
