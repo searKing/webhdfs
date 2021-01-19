@@ -61,26 +61,58 @@ func TestClient_GetFileStatus(t *testing.T) {
 		t.Fatalf("webhdfs GetFileStatus failed: %s", err)
 	}
 	defer resp.Body.Close()
-	t.Logf("FileStatus: %v", resp.FileStatus)
-	t.Logf("AccessTime: %s", resp.FileStatus.AccessTime.Time.String())
-	t.Logf("ModificationTime: %s", resp.FileStatus.ModificationTime.Time.String())
-	t.Logf("Type: %s", resp.FileStatus.Type)
-	//    client_test.go:62: FileStatus: {1610695991369 134217728 0 17458 supergroup 3659 1610605959024 hdfs  644 1  FILE}
-	//    client_test.go:63: AccessTime: 53010-12-05 01:09:29 +0800 CST
-	//    client_test.go:64: ModificationTime: 53008-01-28 00:10:24 +0800 CST
-	//    client_test.go:65: Type: FILE
+	fi := resp.FileStatus
+	t.Logf("Dir(%t), %s, %d, %s", fi.IsDir(), fi.Name(), fi.Size(), fi.ModTime())
+
+	//    client_test.go:65: Dir(false), core-site.xml, 3659, 2021-01-14 14:32:39.024 +0800 CST
 }
 
 func TestClient_ListStatus(t *testing.T) {
-	resp, err := getClient(t).ListStatus(&webhdfs.ListStatusRequest{
-		Path: aws.String("/data/test"),
-	})
-	if err != nil {
-		t.Fatalf("webhdfs ListStatus failed: %s", err)
+	{
+		resp, err := getClient(t).ListStatus(&webhdfs.ListStatusRequest{
+			Path: aws.String("/data/test/1.jpg"),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs ListStatus failed: %s", err)
+		}
+		defer resp.Body.Close()
+		for _, fi := range resp.FileStatuses.FileStatus {
+			t.Logf("Dir(%t), %s, %d, %s", fi.IsDir(), fi.Name(), fi.Size(), fi.ModTime())
+		}
 	}
-	defer resp.Body.Close()
-	t.Logf("FileStatuses: %v", resp.FileStatuses)
-	//    client_test.go:80: FileStatuses: {[{1610614972965 134217728 0 17460 supergroup 83910 1610614973143 hdfs 1.jpg 755 1  FILE} {1610695991369 134217728 0 17458 supergroup 3659 1610605959024 hdfs core-site.xml 644 1  FILE}]}
+	{
+		resp, err := getClient(t).ListStatus(&webhdfs.ListStatusRequest{
+			Path: aws.String("/data/test"),
+		})
+		if err != nil {
+			t.Fatalf("webhdfs ListStatus failed: %s", err)
+		}
+		defer resp.Body.Close()
+		for _, fi := range resp.FileStatuses.FileStatus {
+			t.Logf("Dir(%t), %s, %d, %s", fi.IsDir(), fi.Name(), fi.Size(), fi.ModTime())
+		}
+	}
+	//    client_test.go:80: Dir(false), 1.jpg, 83910, 2021-01-14 17:02:53.143 +0800 CST
+	//    client_test.go:92: Dir(false), 1.jpg, 83910, 2021-01-14 17:02:53.143 +0800 CST
+	//    client_test.go:92: Dir(false), 1.txt, 6, 2021-01-18 01:05:52.682 +0800 CST
+	//    client_test.go:92: Dir(false), 11.txt, 6, 2021-01-18 01:10:13.415 +0800 CST
+	//    client_test.go:92: Dir(false), 2.txt, 6, 2021-01-18 01:05:52.733 +0800 CST
+	//    client_test.go:92: Dir(false), 22.txt, 6, 2021-01-18 01:10:13.465 +0800 CST
+	//    client_test.go:92: Dir(false), append.12, 6, 2021-01-18 02:02:07.916 +0800 CST
+	//    client_test.go:92: Dir(false), append.1ww2, 12, 2021-01-18 02:06:06.494 +0800 CST
+	//    client_test.go:92: Dir(false), append.sss, 6, 2021-01-18 01:58:51.394 +0800 CST
+	//    client_test.go:92: Dir(false), append.sssdasds, 6, 2021-01-18 02:01:57.719 +0800 CST
+	//    client_test.go:92: Dir(false), append.txt, 66, 2021-01-18 00:56:29.439 +0800 CST
+	//    client_test.go:92: Dir(false), append.txtss, 6, 2021-01-18 01:57:35.445 +0800 CST
+	//    client_test.go:92: Dir(false), append.txtssadad, 6, 2021-01-18 01:58:10.898 +0800 CST
+	//    client_test.go:92: Dir(false), core-site.xml, 3659, 2021-01-14 14:32:39.024 +0800 CST
+	//    client_test.go:92: Dir(true), create, 0, 2021-01-18 19:40:35.765 +0800 CST
+	//    client_test.go:92: Dir(false), create.txt, 0, 2021-01-17 18:13:03.85 +0800 CST
+	//    client_test.go:92: Dir(false), create.txt2, 0, 2021-01-17 18:15:10.164 +0800 CST
+	//    client_test.go:92: Dir(false), create.txt22, 12, 2021-01-17 18:37:37.801 +0800 CST
+	//    client_test.go:92: Dir(false), create.txt2222, 12, 2021-01-17 18:39:15.085 +0800 CST
+	//    client_test.go:92: Dir(false), rename, 12, 2021-01-17 20:19:39.991 +0800 CST
+	//    client_test.go:92: Dir(false), truncate.txt, 6, 2021-01-18 01:16:23.514 +0800 CST
 }
 
 func TestClient_ListStatusBatch(t *testing.T) {

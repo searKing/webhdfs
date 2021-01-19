@@ -124,6 +124,10 @@ func (c *Client) listStatus(ctx context.Context, req *ListStatusRequest) (*ListS
 			continue
 		}
 
+		for i := range resp.FileStatuses.FileStatus {
+			resp.FileStatuses.FileStatus[i].PathPrefix = aws.StringValue(req.Path)
+		}
+
 		return &resp, nil
 	}
 	return nil, errors.Multi(errs...)

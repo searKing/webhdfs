@@ -31,8 +31,8 @@ type GetSnapshottableDirectoryListRequest struct {
 type GetSnapshottableDirectoryListResponse struct {
 	NameNode string `json:"-"`
 	ErrorResponse
-	HttpResponse `json:"-"`
-	SnapshottableDirectoryList
+	HttpResponse               `json:"-"`
+	SnapshottableDirectoryList SnapshottableDirectoryList `json:"SnapshottableDirectoryList" validate:"required"` // An array of SnapshottableDirectoryStatus
 }
 
 func (req *GetSnapshottableDirectoryListRequest) RawPath() string {

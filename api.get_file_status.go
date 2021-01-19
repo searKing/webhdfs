@@ -123,7 +123,7 @@ func (c *Client) getFileStatus(ctx context.Context, req *GetFileStatusRequest) (
 			errs = append(errs, err)
 			continue
 		}
-
+		resp.FileStatus.PathPrefix = aws.StringValue(req.Path)
 		return &resp, nil
 	}
 	return nil, errors.Multi(errs...)

@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 
 	time_ "github.com/searKing/golang/go/time"
 )
@@ -89,6 +91,7 @@ type FileStatus = FileStatusProperties
 // JavaScript syntax is used to define fileStatusProperties so that it can be referred in both FileStatus and FileStatuses JSON schemas.
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#FileStatus_Properties
 type FileStatusProperties struct {
+	PathPrefix       string                    `json:"-"`                                    // The path prefix, for current file|fir
 	AccessTime       time_.UnixTimeMillisecond `json:"accessTime" validate:"required"`       // The access time.
 	BlockSize        int64                     `json:"blockSize" validate:"required"`        // The block size of a file.
 	ChildrenNum      int64                     `json:"childrenNum"`                          // The number of sub files or dirs
@@ -97,11 +100,45 @@ type FileStatusProperties struct {
 	Length           int64                     `json:"length" validate:"required"`           // The number of bytes in a file. in bytes, zero for directories
 	ModificationTime time_.UnixTimeMillisecond `json:"modificationTime" validate:"required"` // The modification time.
 	Owner            string                    `json:"owner" validate:"required"`            // The user who is the owner.
-	PathSuffix       string                    `json:"pathSuffix" validate:"required"`       // The path suffix.
+	PathSuffix       string                    `json:"pathSuffix" validate:"required"`       // The path suffix. for subfile|subdir
 	Permission       FilePermission            `json:"permission" validate:"required"`       // The permission represented as a octal string.
 	Replication      int64                     `json:"replication" validate:"required"`      // The number of replication of a file.
 	Symlink          string                    `json:"symlink"`                              // The link target of a symlink.
 	Type             FileType                  `json:"type" validate:"required"`             // The type of the path object. ["FILE", "DIRECTORY", "SYMLINK"]
+}
+
+// FileStatusProperties implements os.FileInfo, and provides information about a file or directory in HDFS.
+func (fi *FileStatusProperties) Name() string {
+	if fi.PathSuffix != "" {
+		return fi.PathSuffix
+	}
+	return path.Base(path.Join(fi.PathPrefix, fi.PathSuffix))
+}
+
+func (fi *FileStatusProperties) Size() int64 {
+	return fi.Length
+}
+
+func (fi *FileStatusProperties) Mode() os.FileMode {
+	mode := os.FileMode(fi.Permission)
+	if fi.IsDir() {
+		mode |= os.ModeDir
+	}
+
+	return mode
+}
+
+func (fi *FileStatusProperties) ModTime() time.Time {
+	return fi.ModificationTime.Time
+}
+
+func (fi *FileStatusProperties) IsDir() bool {
+	return fi.Type == FileTypeDirectory
+}
+
+// Sys returns the raw *FileStatusProperties message from the namenode.
+func (fi *FileStatusProperties) Sys() interface{} {
+	return fi
 }
 
 type FilePermission uint64
@@ -279,9 +316,7 @@ const (
 )
 
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#SnapshottableDirectoryList_JSON_Schema
-type SnapshottableDirectoryList struct {
-	SnapshottableDirectoryList []SnapshottableDirectoryStatus `json:"SnapshottableDirectoryList" validate:"required"` // An array of SnapshottableDirectoryStatus
-}
+type SnapshottableDirectoryList = []SnapshottableDirectoryStatus // An array of SnapshottableDirectoryStatus
 
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#SnapshottableDirectoryStatus
 type SnapshottableDirectoryStatus struct {
