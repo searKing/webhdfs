@@ -323,11 +323,12 @@ func TestClient_GetECPolicy(t *testing.T) {
 }
 
 func TestClient_Create(t *testing.T) {
-	file := "/data/test/create.txt2222"
+	file := "/data/test.copy/22.txt"
 	{
 		resp, err := getClient(t).Create(&webhdfs.CreateRequest{
-			Path: aws.String(file),
-			Body: strings.NewReader("测试输入"),
+			Path:      aws.String(file),
+			Body:      strings.NewReader("测试输入"),
+			Overwrite: aws.Bool(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Open failed: %s", err)

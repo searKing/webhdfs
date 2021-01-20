@@ -120,7 +120,7 @@ func (c *Client) rename(ctx context.Context, req *RenameRequest) (*RenameRespons
 		if ctx != nil {
 			httpReq = httpReq.WithContext(ctx)
 		}
-		httpResp, err := c.httpClient.Do(httpReq)
+		httpResp, err := c.httpClient().Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)
 			continue

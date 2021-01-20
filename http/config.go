@@ -50,19 +50,24 @@ func (o *Config) Validate() []error {
 // New creates a new server which logically combines the handling chain with the passed server.
 // The handler chain in particular can be difficult as it starts delgating.
 // New usually called after Complete
-func (c completedConfig) New() (Client, error) {
+func (c completedConfig) New() (func() Client, error) {
 	if c.KerberosConfig != nil {
 		krbClient, err := c.KerberosConfig.Complete().New()
 		if err != nil {
 			return nil, err
 		}
 		if krbClient != nil {
-			return spnego.NewClient(krbClient, c.HttpClient, c.KerberosConfig.ServicePrincipleName), nil
+			return func() Client {
+				return spnego.NewClient(krbClient, c.HttpClient, c.KerberosConfig.ServicePrincipleName)
+			}, nil
 		}
 	}
 
-	if c.HttpClient != nil {
-		return c.HttpClient, nil
-	}
-	return http.DefaultClient, nil
+	return func() Client {
+		if c.HttpClient != nil {
+			return c.HttpClient
+		}
+		return http.DefaultClient
+	}, nil
+
 }

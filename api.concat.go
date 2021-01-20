@@ -130,7 +130,7 @@ func (c *Client) concat(ctx context.Context, req *ConcatRequest) (*ConcatRespons
 		if ctx != nil {
 			httpReq = httpReq.WithContext(ctx)
 		}
-		httpResp, err := c.httpClient.Do(httpReq)
+		httpResp, err := c.httpClient().Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)
 			continue

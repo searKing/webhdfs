@@ -12,7 +12,7 @@ import (
 
 //go:generate go-option -type "Client"
 type Client struct {
-	httpClient http_.Client
+	httpClient func() http_.Client
 
 	// options
 	opts *Config

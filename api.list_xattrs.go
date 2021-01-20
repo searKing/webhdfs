@@ -110,7 +110,7 @@ func (c *Client) listXAttrs(ctx context.Context, req *ListXAttrsRequest) (*ListX
 		if ctx != nil {
 			httpReq = httpReq.WithContext(ctx)
 		}
-		httpResp, err := c.httpClient.Do(httpReq)
+		httpResp, err := c.httpClient().Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)
 			continue
