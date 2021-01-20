@@ -101,7 +101,7 @@ type FileStatusProperties struct {
 	ModificationTime time_.UnixTimeMillisecond `json:"modificationTime" validate:"required"` // The modification time.
 	Owner            string                    `json:"owner" validate:"required"`            // The user who is the owner.
 	PathSuffix       string                    `json:"pathSuffix" validate:"required"`       // The path suffix. for subfile|subdir
-	Permission       FilePermission            `json:"permission" validate:"required"`       // The permission represented as a octal string.
+	Permission       Permission                `json:"permission" validate:"required"`       // The permission represented as a octal string.
 	Replication      int64                     `json:"replication" validate:"required"`      // The number of replication of a file.
 	Symlink          string                    `json:"symlink"`                              // The link target of a symlink.
 	Type             FileType                  `json:"type" validate:"required"`             // The type of the path object. ["FILE", "DIRECTORY", "SYMLINK"]
@@ -141,29 +141,37 @@ func (fi *FileStatusProperties) Sys() interface{} {
 	return fi
 }
 
-type FilePermission uint64
+// The permission of a file/directory.
+// 644 for files, 755 for directories
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Permission
+type Permission uint64
 
-func (p FilePermission) String() string {
+const (
+	DefaultPermissionFile      Permission = 0644
+	DefaultPermissionDirectory Permission = 0755
+)
+
+func (p Permission) String() string {
 	return fmt.Sprintf("%o", p)
 }
 
 // MarshalJSON implements the json.Marshaler interface for XAttrNamespace
-func (p FilePermission) MarshalJSON() ([]byte, error) {
+func (p Permission) MarshalJSON() ([]byte, error) {
 	return json.Marshal(p.String())
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface for XAttrNamespace
-func (p *FilePermission) UnmarshalJSON(data []byte) error {
+func (p *Permission) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
-		return fmt.Errorf("FilePermission should be a string, got %s", data)
+		return fmt.Errorf("Permission should be a string, got %s", data)
 	}
 
 	i, err := strconv.ParseUint(s, 8, 32)
 	if err != nil {
 		return err
 	}
-	*p = FilePermission(i)
+	*p = Permission(i)
 	return nil
 }
 
