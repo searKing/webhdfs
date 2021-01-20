@@ -10,6 +10,7 @@ import (
 	"net/url"
 
 	"github.com/aws/aws-sdk-go/aws"
+	http_ "github.com/searKing/golang/go/net/http"
 	strings_ "github.com/searKing/golang/go/strings"
 
 	"github.com/searKing/golang/go/errors"
@@ -134,6 +135,7 @@ func (c *Client) append(ctx context.Context, req *AppendRequest) (*AppendRespons
 		if err != nil {
 			return nil, err
 		}
+		httpReq = http_.RequestWithBodyRewindable(httpReq)
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}

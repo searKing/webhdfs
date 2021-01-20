@@ -10,6 +10,8 @@ import (
 	"net/url"
 
 	"github.com/aws/aws-sdk-go/aws"
+
+	http_ "github.com/searKing/golang/go/net/http"
 	strings_ "github.com/searKing/golang/go/strings"
 
 	"github.com/searKing/golang/go/errors"
@@ -178,6 +180,7 @@ func (c *Client) create(ctx context.Context, req *CreateRequest) (*CreateRespons
 		if err != nil {
 			return nil, err
 		}
+		httpReq = http_.RequestWithBodyRewindable(httpReq)
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
@@ -203,4 +206,9 @@ func (c *Client) create(ctx context.Context, req *CreateRequest) (*CreateRespons
 		return &resp, nil
 	}
 	return nil, errors.Multi(errs...)
+}
+
+type teeReadCloser struct {
+	io.Reader
+	io.Closer
 }
