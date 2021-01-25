@@ -240,15 +240,19 @@ const (
 func (e *RemoteException) Unwrap() error {
 	switch e.JavaClassName {
 	case JavaClassNameFileNotFoundException:
-		return os.ErrNotExist
+		//return os.ErrNotExist
+		return syscall.ENOENT
 	case JavaClassNameAccessControlException:
-		return os.ErrPermission
+		//return os.ErrPermission
+		return syscall.EPERM
 	case JavaClassNamePathIsNotEmptyDirectoryException:
 		return syscall.ENOTEMPTY
 	case JavaClassNameFileAlreadyExistsException:
-		return os.ErrExist
+		//return os.ErrExist
+		return syscall.ENOTEMPTY
 	case JavaClassNameAlreadyBeingCreatedException:
-		return os.ErrExist
+		//return os.ErrExist
+		return syscall.EEXIST
 	default:
 		return fmt.Errorf("%s", e.Error())
 	}
