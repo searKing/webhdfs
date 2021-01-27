@@ -29,6 +29,23 @@ type CreateRequest struct {
 
 	// Object data.
 	Body io.Reader
+	// ContentLength records the length of the associated content.
+	// The value -1 indicates that the length is unknown.
+	// Values >= 0 indicate that the given number of bytes may
+	// be read from Body.
+	//
+	// For client requests, a value of 0 with a non-nil Body is
+	// also treated as unknown.
+	// For HttpFs, ContentType and ContentLength is needed with a non-nil Body
+	// ContentLength will be computed inner when Body is one of type [*bytes.Buffer, *bytes.Reader, *strings.Reader]
+	// See https://issues.cloudera.org/browse/HUE-679
+	// Missing or unknown request method
+	// Missing URL
+	// Missing HTTP Identifier (HTTP/1.0)
+	// Request is too large
+	// Content-Length missing for POST or PUT requests
+	// Illegal character in hostname; underscores are not allowed
+	ContentLength *int64
 
 	// Name				overwrite
 	// Description		If a file already exists, should it be overwritten?
@@ -180,9 +197,15 @@ func (c *Client) create(ctx context.Context, req *CreateRequest) (*CreateRespons
 		if err != nil {
 			return nil, err
 		}
-		httpReq = http_.RequestWithBodyRewindable(httpReq)
+		_ = http_.RequestWithBodyRewindable(httpReq)
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+		}
+
+		// See :https://issues.cloudera.org/browse/HUE-679
+		httpReq.Header.Set("Content-Type", "application/octet-stream")
+		if req.ContentLength != nil {
+			httpReq.ContentLength = aws.Int64Value(req.ContentLength)
 		}
 
 		if ctx != nil {
