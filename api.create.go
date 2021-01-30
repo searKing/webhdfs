@@ -53,6 +53,7 @@ type CreateRequest struct {
 	// Default Value	false
 	// Valid Values		true
 	// Syntax			true
+	// Actually, HttpFS default to true
 	Overwrite *bool
 	// Name				blocksize
 	// Description		The block size of a file.
@@ -141,7 +142,11 @@ func (resp *CreateResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	resp.HttpResponse.UnmarshalHTTP(httpResp)
 
 	if isSuccessHttpCode(httpResp.StatusCode) && !resp.NoDirect {
-		return nil
+		// HttpFS always returns a redirected url in json
+		// {"Location":"http://<DATANODE>:<PORT>/webhdfs/v1/<PATH>?op=CREATE..."}
+		if httpResp.ContentLength == 0 {
+			return nil
+		}
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
@@ -149,10 +154,7 @@ func (resp *CreateResponse) UnmarshalHTTP(httpResp *http.Response) error {
 		return err
 	}
 	if len(body) == 0 {
-		return nil
-	}
-	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
@@ -167,6 +169,7 @@ func (resp *CreateResponse) UnmarshalHTTP(httpResp *http.Response) error {
 // Create and Write to a File
 // If no permissions are specified, the newly created file will be assigned with default 644 permission.
 // No umask mode will be applied from server side (so “fs.permissions.umask-mode” value configuration set on Namenode side will have no effect).
+// Parent Dirs will be created automatically.
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Create_and_Write_to_a_File
 func (c *Client) Create(req *CreateRequest) (*CreateResponse, error) {
 	return c.create(nil, req)

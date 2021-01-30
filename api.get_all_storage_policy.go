@@ -54,7 +54,7 @@ func (resp *GetAllStoragePolicyResponse) UnmarshalHTTP(httpResp *http.Response) 
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {

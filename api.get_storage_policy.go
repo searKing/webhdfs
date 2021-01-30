@@ -17,6 +17,11 @@ type GetStoragePolicyRequest struct {
 	Authentication
 	ProxyUser
 	CSRF
+
+	// Path of the object to get.
+	//
+	// Path is a required field
+	Path *string
 }
 
 type GetStoragePolicyResponse struct {
@@ -27,7 +32,7 @@ type GetStoragePolicyResponse struct {
 }
 
 func (req *GetStoragePolicyRequest) RawPath() string {
-	return ""
+	return aws.StringValue(req.Path)
 }
 func (req *GetStoragePolicyRequest) RawQuery() string {
 	v := url.Values{}
@@ -54,7 +59,7 @@ func (resp *GetStoragePolicyResponse) UnmarshalHTTP(httpResp *http.Response) err
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {

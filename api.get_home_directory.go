@@ -18,11 +18,6 @@ type GetHomeDirectoryRequest struct {
 	Authentication
 	ProxyUser
 	CSRF
-
-	// Path of the object to get.
-	//
-	// Path is a required field
-	Path *string `validate:"required"`
 }
 
 type GetHomeDirectoryResponse struct {
@@ -33,7 +28,7 @@ type GetHomeDirectoryResponse struct {
 }
 
 func (req *GetHomeDirectoryRequest) RawPath() string {
-	return aws.StringValue(req.Path)
+	return ""
 }
 func (req *GetHomeDirectoryRequest) RawQuery() string {
 	v := url.Values{}
@@ -60,7 +55,7 @@ func (resp *GetHomeDirectoryResponse) UnmarshalHTTP(httpResp *http.Response) err
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {

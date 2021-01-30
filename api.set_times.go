@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	"github.com/aws/aws-sdk-go/aws"
+
 	strings_ "github.com/searKing/golang/go/strings"
 
 	"github.com/searKing/golang/go/errors"
@@ -84,7 +85,7 @@ func (resp *SetTimesResponse) UnmarshalHTTP(httpResp *http.Response) error {
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
@@ -96,8 +97,8 @@ func (resp *SetTimesResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	return nil
 }
 
-// Replication
-// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Replication
+// Set Access or Modification Time
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Set_Access_or_Modification_Time
 func (c *Client) SetTimes(req *SetTimesRequest) (*SetTimesResponse, error) {
 	return c.setTimes(nil, req)
 }

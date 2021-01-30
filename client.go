@@ -13,6 +13,7 @@ import (
 //go:generate go-option -type "Client"
 type Client struct {
 	httpClient func() http_.Client
+	username   *string
 
 	// options
 	opts *Config
@@ -48,6 +49,12 @@ func (c *Client) HttpUrl(query Request) url.URL {
 		Path:     path.Join(PathPrefix, query.RawPath()),
 		RawQuery: query.RawQuery(),
 	}
+}
+
+// ProxyUser returns the authenticated user, may be needed as 'user.name' to authenticate
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Authentication
+func (c *Client) ProxyUser() ProxyUser {
+	return ProxyUser{Username: c.username}
 }
 
 func isSuccessHttpCode(code int) bool {

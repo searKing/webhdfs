@@ -65,7 +65,7 @@ func (resp *GetSnapshottableDirectoryListResponse) UnmarshalHTTP(httpResp *http.
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	if err = json.Unmarshal(body, &resp); err != nil {
 		return err

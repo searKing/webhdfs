@@ -29,7 +29,7 @@ type DeleteSnapshotRequest struct {
 	// Valid Values		Any valid snapshot name.
 	// Syntax			Any string.
 	// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Snapshot_Name
-	Snapshotname *string `json:"snapshotname,omitempty"`
+	Snapshotname *string `json:"snapshotname,omitempty" validate:"required"`
 }
 
 type DeleteSnapshotResponse struct {
@@ -68,7 +68,7 @@ func (resp *DeleteSnapshotResponse) UnmarshalHTTP(httpResp *http.Response) error
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	if err = json.Unmarshal(body, &resp); err != nil {
 		return err

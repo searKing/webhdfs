@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	"github.com/aws/aws-sdk-go/aws"
+
 	strings_ "github.com/searKing/golang/go/strings"
 
 	"github.com/searKing/golang/go/errors"
@@ -37,6 +38,8 @@ type TruncateResponse struct {
 	ErrorResponse
 	HttpResponse `json:"-"`
 
+	// true: truncate to newlength
+	// false: truncate to zero
 	Boolean Boolean `json:"boolean"`
 }
 
@@ -65,16 +68,13 @@ func (req *TruncateRequest) RawQuery() string {
 func (resp *TruncateResponse) UnmarshalHTTP(httpResp *http.Response) error {
 	resp.HttpResponse.UnmarshalHTTP(httpResp)
 
-	if isSuccessHttpCode(httpResp.StatusCode) {
-		return nil
-	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {

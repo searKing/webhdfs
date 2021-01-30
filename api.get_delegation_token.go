@@ -85,7 +85,7 @@ func (resp *GetDelegationTokenResponse) UnmarshalHTTP(httpResp *http.Response) e
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	if err = json.Unmarshal(body, &resp); err != nil {
 		return err

@@ -66,7 +66,7 @@ func (resp *CancelDelegationTokenResponse) UnmarshalHTTP(httpResp *http.Response
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	if err = json.Unmarshal(body, &resp); err != nil {
 		return err

@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 
 	"github.com/searKing/golang/go/errors"
+	time_ "github.com/searKing/golang/go/time"
 )
 
 type RenewDelegationTokenRequest struct {
@@ -31,7 +32,8 @@ type RenewDelegationTokenResponse struct {
 	NameNode string `json:"-"`
 	ErrorResponse
 	HttpResponse `json:"-"`
-	Long         Long `json:"long"`
+	//Long         Long `json:"long"`
+	Long time_.UnixTimeMillisecond `json:"long"`
 }
 
 func (req *RenewDelegationTokenRequest) RawPath() string {
@@ -64,7 +66,7 @@ func (resp *RenewDelegationTokenResponse) UnmarshalHTTP(httpResp *http.Response)
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	if err = json.Unmarshal(body, &resp); err != nil {
 		return err

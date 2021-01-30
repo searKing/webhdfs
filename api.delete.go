@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	"github.com/aws/aws-sdk-go/aws"
+
 	strings_ "github.com/searKing/golang/go/strings"
 
 	"github.com/searKing/golang/go/errors"
@@ -38,6 +39,8 @@ type DeleteResponse struct {
 	ErrorResponse
 	HttpResponse `json:"-"`
 
+	// False if file not exist
+	// True if file existed and deleted by this API
 	Boolean Boolean `json:"boolean"`
 }
 
@@ -77,7 +80,7 @@ func (resp *DeleteResponse) UnmarshalHTTP(httpResp *http.Response) error {
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {

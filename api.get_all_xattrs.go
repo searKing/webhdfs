@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	"github.com/aws/aws-sdk-go/aws"
+
 	strings_ "github.com/searKing/golang/go/strings"
 
 	"github.com/searKing/golang/go/errors"
@@ -28,14 +29,15 @@ type GetAllXAttrsRequest struct {
 	// Valid encodings are “text”, “hex”, and “base64”.
 	// Values encoded as text strings are enclosed in double quotes ("),
 	// and values encoded as hexadecimal and base64 are prefixed with 0x and 0s, respectively.
-	Encoding *XAttrValueEncoding `validate:"required"`
+	// actually, encoding is not required, so nil is allowed.
+	Encoding *XAttrValueEncoding //`validate:"required"`
 }
 
 type GetAllXAttrsResponse struct {
 	NameNode string `json:"-"`
 	ErrorResponse
 	HttpResponse `json:"-"`
-	XAttrs
+	XAttrs       `json:"XAttrs"` // XAttr array.
 }
 
 func (req *GetAllXAttrsRequest) RawPath() string {
@@ -69,7 +71,7 @@ func (resp *GetAllXAttrsResponse) UnmarshalHTTP(httpResp *http.Response) error {
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {

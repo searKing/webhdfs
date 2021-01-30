@@ -10,6 +10,7 @@ import (
 	"net/url"
 
 	"github.com/aws/aws-sdk-go/aws"
+
 	http_ "github.com/searKing/golang/go/net/http"
 	strings_ "github.com/searKing/golang/go/strings"
 
@@ -108,7 +109,7 @@ func (resp *AppendResponse) UnmarshalHTTP(httpResp *http.Response) error {
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {

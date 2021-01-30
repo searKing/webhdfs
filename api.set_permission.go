@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	"github.com/aws/aws-sdk-go/aws"
+
 	strings_ "github.com/searKing/golang/go/strings"
 
 	"github.com/searKing/golang/go/errors"
@@ -24,21 +25,13 @@ type SetPermissionRequest struct {
 	// Path is a required field
 	Path *string `validate:"required"`
 
-	// Name				owner
-	// Description		The username who is the owner of a file/directory.
-	// Type				String
-	// Default Value	<empty> (means keeping it unchanged)
-	// Valid Values		Any valid username.
-	// Syntax			Any string.
-	Owner *string
-
-	// Name				group
-	// Description		The name of a group.
-	// Type				String
-	// Default Value	<empty> (means keeping it unchanged)
-	// Valid Values		Any valid group name.
-	// Syntax			Any string.
-	Group *string
+	// Name				permission
+	// Description		The permission of a file/directory.
+	// Type				Octal
+	// Default Value	644 for files, 755 for directories
+	// Valid Values		0 - 1777
+	// Syntax			Any radix-8 integer (leading zeros may be omitted.)
+	Permission *Permission
 }
 
 type SetPermissionResponse struct {
@@ -63,11 +56,8 @@ func (req *SetPermissionRequest) RawQuery() string {
 		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
 	}
 
-	if req.Owner != nil {
-		v.Set("owner", aws.StringValue(req.Owner))
-	}
-	if req.Group != nil {
-		v.Set("group", aws.StringValue(req.Group))
+	if req.Permission != nil {
+		v.Set("permission", req.Permission.String())
 	}
 	return v.Encode()
 }
@@ -83,7 +73,7 @@ func (resp *SetPermissionResponse) UnmarshalHTTP(httpResp *http.Response) error 
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
@@ -95,8 +85,8 @@ func (resp *SetPermissionResponse) UnmarshalHTTP(httpResp *http.Response) error 
 	return nil
 }
 
-// Set Owner
-// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Set_Owner
+// Set Permission
+// See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Set_Permission
 func (c *Client) SetPermission(req *SetPermissionRequest) (*SetPermissionResponse, error) {
 	return c.setPermission(nil, req)
 }

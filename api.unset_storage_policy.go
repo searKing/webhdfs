@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	"github.com/aws/aws-sdk-go/aws"
+
 	strings_ "github.com/searKing/golang/go/strings"
 
 	"github.com/searKing/golang/go/errors"
@@ -46,7 +47,6 @@ func (req *UnsetStoragePolicyRequest) RawQuery() string {
 	if req.ProxyUser.DoAs != nil {
 		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
 	}
-
 	return v.Encode()
 }
 
@@ -62,7 +62,7 @@ func (resp *UnsetStoragePolicyResponse) UnmarshalHTTP(httpResp *http.Response) e
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {

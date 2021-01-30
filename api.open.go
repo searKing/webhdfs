@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	"github.com/aws/aws-sdk-go/aws"
+
 	strings_ "github.com/searKing/golang/go/strings"
 
 	"github.com/searKing/golang/go/errors"
@@ -22,6 +23,7 @@ type OpenRequest struct {
 	// Path of the object to get.
 	//
 	// Path is a required field
+	// '/' will be ignored automatically
 	Path *string `validate:"required"`
 
 	// Name				offset
@@ -108,7 +110,7 @@ func (resp *OpenResponse) UnmarshalHTTP(httpResp *http.Response) error {
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {

@@ -14,9 +14,7 @@ import (
 )
 
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#XAttrs_JSON_Schema
-type XAttrs struct {
-	XAttrs []XAttr `json:"XAttrs"` // XAttr array.
-}
+type XAttrs = []XAttr
 
 type XAttr struct {
 	Name  string `json:"name" validate:"required"`  // XAttr name.
@@ -24,8 +22,29 @@ type XAttr struct {
 }
 
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#XAttrNames_JSON_Schema
-type XAttrNames struct {
-	XAttrNames string `json:"XAttrNames" validate:"required"` // XAttr names.
+type XAttrNames []string
+
+func (names *XAttrNames) UnmarshalJSON(data []byte) error {
+	unquoteNames, err := strconv.Unquote(string(data))
+	if err != nil {
+		return err
+	}
+	var ns []string
+	err = json.Unmarshal([]byte(unquoteNames), &ns)
+	if err != nil {
+		return err
+	}
+	*names = ns
+
+	return nil
+}
+
+func (name XAttrNames) MarshalJSON() ([]byte, error) {
+	data, err := json.Marshal([]string(name))
+	if err != nil {
+		return nil, err
+	}
+	return []byte(strconv.Quote(string(data))), nil
 }
 
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#Boolean_JSON_Schema
@@ -33,6 +52,8 @@ type Boolean = bool // A boolean value.
 
 // See: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/WebHDFS.html#ContentSummary_JSON_Schema
 type ContentSummary struct {
+	// If Path is a File, then DirectoryCount == 0
+	// If Path is a Directory, then the Path is included as '.', DirectoryCount == len(subdirs) + 1(.)
 	DirectoryCount int64 `json:"directoryCount" validate:"required"` // The number of directories.
 	FileCount      int64 `json:"fileCount" validate:"required"`      // The number of files.
 	// Length is the total size of the named path, including any subdirectories.
@@ -151,8 +172,13 @@ const (
 	DefaultPermissionDirectory Permission = 0755
 )
 
+func (p Permission) New() *Permission {
+	var perm = p
+	return &perm
+}
+
 func (p Permission) String() string {
-	return fmt.Sprintf("%o", p)
+	return fmt.Sprintf("%#o", p)
 }
 
 // MarshalJSON implements the json.Marshaler interface for XAttrNamespace

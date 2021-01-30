@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/go-playground/validator/v10"
 
 	"github.com/searKing/webhdfs/kerberos"
@@ -12,6 +13,12 @@ import (
 func withEndpoint(endpoint string) ClientOption {
 	return ClientOptionFunc(func(c *Client) {
 		c.opts.Addresses = strings.Split(endpoint, ",")
+	})
+}
+
+func withUsername(username string) ClientOption {
+	return ClientOptionFunc(func(c *Client) {
+		c.opts.Username = aws.String(username)
 	})
 }
 

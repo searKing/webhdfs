@@ -1,6 +1,7 @@
 package webhdfs
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -63,4 +64,14 @@ func (resp *HttpResponse) UnmarshalHTTP(httpResp *http.Response) {
 	resp.Body = httpResp.Body
 	httpResp.Body = http.NoBody
 	return
+}
+
+func ErrorFromHttpResponse(resp *http.Response) error {
+	if resp == nil {
+		return nil
+	}
+	if isSuccessHttpCode(resp.StatusCode) {
+		return nil
+	}
+	return fmt.Errorf("unexpected http status code: %d %s", resp.StatusCode, http.StatusText(resp.StatusCode))
 }

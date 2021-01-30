@@ -18,6 +18,11 @@ type GetSnapshotDiffRequest struct {
 	ProxyUser
 	CSRF
 
+	// Path of the object to get.
+	//
+	// Path is a required field
+	Path *string `validate:"required"`
+
 	// Name				oldsnapshotname
 	// Description		The old name of the snapshot to be renamed.
 	// Type				String
@@ -44,7 +49,7 @@ type GetSnapshotDiffResponse struct {
 }
 
 func (req *GetSnapshotDiffRequest) RawPath() string {
-	return ""
+	return aws.StringValue(req.Path)
 }
 func (req *GetSnapshotDiffRequest) RawQuery() string {
 	v := url.Values{}
@@ -76,7 +81,7 @@ func (resp *GetSnapshotDiffResponse) UnmarshalHTTP(httpResp *http.Response) erro
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	if err = json.Unmarshal(body, &resp); err != nil {
 		return err

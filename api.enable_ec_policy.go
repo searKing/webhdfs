@@ -68,7 +68,7 @@ func (resp *EnableECPolicyResponse) UnmarshalHTTP(httpResp *http.Response) error
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {

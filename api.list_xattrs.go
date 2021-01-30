@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	"github.com/aws/aws-sdk-go/aws"
+
 	strings_ "github.com/searKing/golang/go/strings"
 
 	"github.com/searKing/golang/go/errors"
@@ -29,7 +30,7 @@ type ListXAttrsResponse struct {
 	NameNode string `json:"-"`
 	ErrorResponse
 	HttpResponse `json:"-"`
-	XAttrNames
+	XAttrNames   XAttrNames `json:"XAttrNames" validate:"required"` // XAttr names.
 }
 
 func (req *ListXAttrsRequest) RawPath() string {
@@ -60,7 +61,7 @@ func (resp *ListXAttrsResponse) UnmarshalHTTP(httpResp *http.Response) error {
 		return err
 	}
 	if len(body) == 0 {
-		return nil
+		return ErrorFromHttpResponse(httpResp)
 	}
 	err = json.Unmarshal(body, &resp)
 	if err != nil {

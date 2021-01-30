@@ -2,9 +2,13 @@ package webhdfs
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/go-playground/validator/v10"
+	path_ "github.com/searKing/golang/go/path"
 
 	http_ "github.com/searKing/webhdfs/http"
-	"github.com/go-playground/validator/v10"
 )
 
 // Code borrowed from https://github.com/kubernetes/kubernetes
@@ -12,6 +16,9 @@ import (
 type Config struct {
 	// Addresses specifies the namenode(s) to connect to.
 	Addresses []string
+
+	// The authenticated user
+	Username *string
 
 	// Set this to `true` to disable SSL when sending requests. Defaults
 	// to `false`.
@@ -72,6 +79,26 @@ func (c completedConfig) New() (*Client, error) {
 
 	return &Client{
 		httpClient: httpClient,
+		username:   c.proxyUser(),
 		opts:       c.Config,
 	}, nil
+}
+
+func (c completedConfig) proxyUser() *string {
+	if c.Username != nil {
+		return c.Username
+	}
+	if c.HttpConfig == nil || c.HttpConfig.KerberosConfig == nil {
+		return nil
+	}
+	username := c.HttpConfig.KerberosConfig.UserName
+	if username == "" {
+		return nil
+	}
+
+	i := strings.Index(username, string(path_.Separator))
+	if i >= 0 {
+		return aws.String(username[:i])
+	}
+	return aws.String(username)
 }
