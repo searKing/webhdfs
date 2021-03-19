@@ -17,6 +17,7 @@ type GetAllStoragePolicyRequest struct {
 	Authentication
 	ProxyUser
 	CSRF
+	HttpRequest
 }
 
 type GetAllStoragePolicyResponse struct {
@@ -98,12 +99,20 @@ func (c *Client) getAllStoragePolicy(ctx context.Context, req *GetAllStoragePoli
 			errs = append(errs, err)
 			continue
 		}
+		httpReq.Close = req.HttpRequest.Close
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 		if ctx != nil {
 			httpReq = httpReq.WithContext(ctx)
 		}
+		if req.HttpRequest.PreSendHandler != nil {
+			httpReq, err = req.HttpRequest.PreSendHandler(httpReq)
+			if err != nil {
+				return nil, fmt.Errorf("pre send handled: %w", err)
+			}
+		}
+
 		httpResp, err := c.httpClient().Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)

@@ -19,6 +19,7 @@ type OpenRequest struct {
 	Authentication
 	ProxyUser
 	CSRF
+	HttpRequest
 
 	// Path of the object to get.
 	//
@@ -155,12 +156,20 @@ func (c *Client) open(ctx context.Context, req *OpenRequest) (*OpenResponse, err
 			errs = append(errs, err)
 			continue
 		}
+		httpReq.Close = req.HttpRequest.Close
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
 		if ctx != nil {
 			httpReq = httpReq.WithContext(ctx)
 		}
+		if req.HttpRequest.PreSendHandler != nil {
+			httpReq, err = req.HttpRequest.PreSendHandler(httpReq)
+			if err != nil {
+				return nil, fmt.Errorf("pre send handled: %w", err)
+			}
+		}
+
 		httpResp, err := c.httpClient().Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)

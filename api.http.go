@@ -9,6 +9,17 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 )
 
+type HttpRequest struct {
+	// Close indicates whether to close the connection after
+	// replying to this request (for servers) or after sending this
+	// request and reading its response (for clients).
+	//
+	// some proxy does not support reuse connection, set Close true to disable it.
+	Close bool
+
+	PreSendHandler func(req *http.Request) (*http.Request, error)
+}
+
 type HttpResponse struct {
 	// Indicates that a range of bytes was specified.
 	AcceptRanges *string

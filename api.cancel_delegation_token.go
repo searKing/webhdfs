@@ -17,6 +17,7 @@ type CancelDelegationTokenRequest struct {
 	Authentication
 	ProxyUser
 	CSRF
+	HttpRequest
 
 	// Name				token
 	// Description		The delegation token used for the operation.
@@ -113,6 +114,7 @@ func (c *Client) cancelDelegationToken(ctx context.Context, req *CancelDelegatio
 		if err != nil {
 			return nil, err
 		}
+		httpReq.Close = req.HttpRequest.Close
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
@@ -120,6 +122,13 @@ func (c *Client) cancelDelegationToken(ctx context.Context, req *CancelDelegatio
 		if ctx != nil {
 			httpReq = httpReq.WithContext(ctx)
 		}
+		if req.HttpRequest.PreSendHandler != nil {
+			httpReq, err = req.HttpRequest.PreSendHandler(httpReq)
+			if err != nil {
+				return nil, fmt.Errorf("pre send handled: %w", err)
+			}
+		}
+
 		httpResp, err := c.httpClient().Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)

@@ -21,6 +21,7 @@ type CreateRequest struct {
 	Authentication
 	ProxyUser
 	CSRF
+	HttpRequest
 
 	// Path of the object to get.
 	//
@@ -46,12 +47,6 @@ type CreateRequest struct {
 	// Content-Length missing for POST or PUT requests
 	// Illegal character in hostname; underscores are not allowed
 	ContentLength *int64
-	// Close indicates whether to close the connection after
-	// replying to this request (for servers) or after sending this
-	// request and reading its response (for clients).
-	//
-	// some proxy does not support reuse connection, set Close true to disable it.
-	Close bool
 
 	// Name				overwrite
 	// Description		If a file already exists, should it be overwritten?
@@ -206,8 +201,9 @@ func (c *Client) create(ctx context.Context, req *CreateRequest) (*CreateRespons
 		if err != nil {
 			return nil, err
 		}
-		httpReq.Close = req.Close
+		httpReq.Close = req.HttpRequest.Close
 		_ = http_.RequestWithBodyRewindable(httpReq)
+		httpReq.Close = req.HttpRequest.Close
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
@@ -221,6 +217,13 @@ func (c *Client) create(ctx context.Context, req *CreateRequest) (*CreateRespons
 		if ctx != nil {
 			httpReq = httpReq.WithContext(ctx)
 		}
+		if req.HttpRequest.PreSendHandler != nil {
+			httpReq, err = req.HttpRequest.PreSendHandler(httpReq)
+			if err != nil {
+				return nil, fmt.Errorf("pre send handled: %w", err)
+			}
+		}
+
 		httpResp, err := c.httpClient().Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)

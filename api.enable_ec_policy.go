@@ -18,6 +18,7 @@ type EnableECPolicyRequest struct {
 	Authentication
 	ProxyUser
 	CSRF
+	HttpRequest
 
 	// Name				ecpolicy, Erasure Coding Policy
 	// Description		The name of the erasure coding policy.
@@ -112,6 +113,7 @@ func (c *Client) enableECPolicy(ctx context.Context, req *EnableECPolicyRequest)
 		if err != nil {
 			return nil, err
 		}
+		httpReq.Close = req.HttpRequest.Close
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
 		}
@@ -119,6 +121,13 @@ func (c *Client) enableECPolicy(ctx context.Context, req *EnableECPolicyRequest)
 		if ctx != nil {
 			httpReq = httpReq.WithContext(ctx)
 		}
+		if req.HttpRequest.PreSendHandler != nil {
+			httpReq, err = req.HttpRequest.PreSendHandler(httpReq)
+			if err != nil {
+				return nil, fmt.Errorf("pre send handled: %w", err)
+			}
+		}
+
 		httpResp, err := c.httpClient().Do(httpReq)
 		if err != nil {
 			errs = append(errs, err)
