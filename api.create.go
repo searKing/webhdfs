@@ -46,6 +46,12 @@ type CreateRequest struct {
 	// Content-Length missing for POST or PUT requests
 	// Illegal character in hostname; underscores are not allowed
 	ContentLength *int64
+	// Close indicates whether to close the connection after
+	// replying to this request (for servers) or after sending this
+	// request and reading its response (for clients).
+	//
+	// some proxy does not support reuse connection, set Close true to disable it.
+	Close bool
 
 	// Name				overwrite
 	// Description		If a file already exists, should it be overwritten?
@@ -200,6 +206,7 @@ func (c *Client) create(ctx context.Context, req *CreateRequest) (*CreateRespons
 		if err != nil {
 			return nil, err
 		}
+		httpReq.Close = req.Close
 		_ = http_.RequestWithBodyRewindable(httpReq)
 		if req.CSRF.XXsrfHeader != nil {
 			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
