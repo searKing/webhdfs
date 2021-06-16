@@ -4,8 +4,10 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strings"
 
 	"github.com/searKing/golang/go/errors"
+	path_ "github.com/searKing/golang/go/path"
 
 	http_ "github.com/searKing/webhdfs/http"
 )
@@ -44,9 +46,15 @@ type Request interface {
 }
 
 func (c *Client) HttpUrl(query Request) url.URL {
+	var sep string
+	// keep last '/',avoid path.Join clean
+	// for hdfs only accept path which starts with '/'
+	if strings.HasSuffix(query.RawPath(), string(path_.Separator)) {
+		sep = string(path_.Separator)
+	}
 	return url.URL{
 		Scheme:   c.HttpSchema(),
-		Path:     path.Join(PathPrefix, query.RawPath()),
+		Path:     path.Join(PathPrefix, query.RawPath()) + sep,
 		RawQuery: query.RawQuery(),
 	}
 }
