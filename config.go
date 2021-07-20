@@ -1,7 +1,6 @@
 package webhdfs
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -11,11 +10,12 @@ import (
 	http_ "github.com/searKing/webhdfs/http"
 )
 
+// Config
 // Code borrowed from https://github.com/kubernetes/kubernetes
 // call chains: NewConfig -> Complete -> [Validate] -> New|Apply
 type Config struct {
 	// Addresses specifies the namenode(s) to connect to.
-	Addresses []string
+	Addresses []string `validate:"required"`
 
 	// The authenticated user
 	Username *string
@@ -24,7 +24,7 @@ type Config struct {
 	// to `false`.
 	DisableSSL bool
 
-	HttpConfig *http_.Config
+	HttpConfig *http_.Config `validate:"dive"`
 
 	Validator *validator.Validate
 }
@@ -56,16 +56,15 @@ func (o *Config) Complete() CompletedConfig {
 	if o.Validator == nil {
 		o.Validator = validator.New()
 	}
+	if o.HttpConfig.Validator == nil {
+		o.HttpConfig.Validator = o.Validator
+	}
 	return CompletedConfig{&completedConfig{o}}
 }
 
-// Validate checks Config and return a slice of found errs.
-func (o *Config) Validate() []error {
-	errs := o.HttpConfig.Validate()
-	if len(o.Addresses) == 0 {
-		errs = append(errs, fmt.Errorf("missing namenode addresses"))
-	}
-	return errs
+// Validate checks Config.
+func (o *completedConfig) Validate() error {
+	return o.Validator.Struct(o)
 }
 
 // New creates a new server which logically combines the handling chain with the passed server.

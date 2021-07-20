@@ -3,6 +3,7 @@ package kerberos
 import (
 	"fmt"
 
+	"github.com/go-playground/validator/v10"
 	krb "github.com/jcmturner/gokrb5/v8/client"
 	"github.com/jcmturner/gokrb5/v8/config"
 	"github.com/jcmturner/gokrb5/v8/credentials"
@@ -10,6 +11,7 @@ import (
 	"github.com/searKing/golang/go/errors"
 )
 
+// Config
 // Code borrowed from https://github.com/kubernetes/kubernetes
 // call chains: NewConfig -> Complete -> [Validate] -> New|Apply
 type Config struct {
@@ -27,6 +29,7 @@ type Config struct {
 	CCacheFile string
 	KeyTabFile string
 	ConfigFile string
+	Validator  *validator.Validate
 }
 
 type completedConfig struct {
@@ -56,18 +59,25 @@ func NewConfig() *Config {
 // Complete fills in any fields not set that are required to have valid data and can be derived
 // from other fields. If you're going to ApplyOptions, do that first. It's mutating the receiver.
 func (o *Config) Complete() CompletedConfig {
+	if o.Validator == nil {
+		o.Validator = validator.New()
+	}
 	return CompletedConfig{&completedConfig{o}}
 }
 
-// Validate checks Config and return a slice of found errs.
-func (o *Config) Validate() []error {
-	return nil
+// Validate checks Config.
+func (c *completedConfig) Validate() error {
+	return c.Validator.Struct(c)
 }
 
 // New creates a new server which logically combines the handling chain with the passed server.
 // The handler chain in particular can be difficult as it starts delgating.
 // New usually called after Complete
 func (c completedConfig) New() (*krb.Client, error) {
+	err := c.Validate()
+	if err != nil {
+		return nil, err
+	}
 	return c.loadKerberosClient()
 }
 
