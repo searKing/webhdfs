@@ -6,7 +6,6 @@ import (
 	"path"
 	"strings"
 
-	"github.com/searKing/golang/go/errors"
 	path_ "github.com/searKing/golang/go/path"
 
 	http_ "github.com/searKing/webhdfs/http"
@@ -26,10 +25,6 @@ func New(endpoint string, opts ...ClientOption) (*Client, error) {
 
 	c := &Client{opts: NewConfig()}
 	c.ApplyOptions(opts...)
-	errs := c.opts.Validate()
-	if err := errors.Multi(errs...); err != nil {
-		return nil, err
-	}
 	return c.opts.Complete().New()
 }
 
