@@ -688,8 +688,8 @@ github.com/ryanuber/columnize v2.1.0+incompatible/go.mod h1:sm1tb6uqfes/u+d4ooFo
 github.com/samuel/go-zookeeper v0.0.0-20190923202752-2cc03de413da/go.mod h1:gi+0XIa01GRL2eRQVjQkKGqKF3SF9vZR/HnPullcV2E=
 github.com/satori/go.uuid v1.2.0/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
 github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529/go.mod h1:DxrIzT+xaE7yg65j358z/aeFdxmN0P9QXhEzd20vsDc=
-github.com/searKing/golang v1.1.22 h1:aLRlM6DwgvfstXsHeu6bibgrc6wVXGzSa8nlHBf6tlg=
-github.com/searKing/golang v1.1.22/go.mod h1:l3PrX573rckwJ34Vjb5rExfBA3jG51ta1Xi499n5UNc=
+github.com/searKing/golang v1.1.23 h1:3TX4cwNZevLzvGCNsfAmDqFakOpJgf8iFNN13gvh6pI=
+github.com/searKing/golang v1.1.23/go.mod h1:l3PrX573rckwJ34Vjb5rExfBA3jG51ta1Xi499n5UNc=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=
 github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24/go.mod h1:M+9NzErvs504Cn4c5DxATwIqPbtswREoFCre64PpcG4=
 github.com/shopspring/decimal v0.0.0-20200227202807-02e2044944cc/go.mod h1:DKyhrW/HYNuLGql+MJL6WCR6knT2jwCFRcu2hWCYk4o=
