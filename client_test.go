@@ -1,3 +1,7 @@
+// Copyright 2022 The searKing Author. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package webhdfs_test
 
 import (
@@ -22,7 +26,7 @@ import (
 
 const (
 	webHdfsEndpoint              = "quickstart.cloudera:50070"
-	httpHdfsEndpoint              = "quickstart.cloudera:14000"
+	httpHdfsEndpoint             = "quickstart.cloudera:14000"
 	KerberosRealm                = "CLOUDERA"
 	KerberosUsername             = "hdfs/quickstart.cloudera"
 	KerberosServicePrincipleName = "HTTP/quickstart.cloudera"
@@ -1139,7 +1143,7 @@ func TestClient_CheckAccess(t *testing.T) {
 		resp, err := c.CheckAccess(&webhdfs.CheckAccessRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
 			Path:      aws.String(file),
-			Fsaction:  aws.String("[r-][w-][x-]"),
+			Fsaction:  aws.String("rwx"),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs CheckAccess failed: %s", err)
