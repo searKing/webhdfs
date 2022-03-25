@@ -1,3 +1,7 @@
+// Copyright 2022 The searKing Author. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package webhdfs
 
 import (
@@ -58,7 +62,9 @@ func (req *CheckAccessRequest) RawQuery() string {
 	if req.ProxyUser.DoAs != nil {
 		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
 	}
-
+	if req.Fsaction != nil {
+		v.Set("fsaction", aws.StringValue(req.Fsaction))
+	}
 	return v.Encode()
 }
 
