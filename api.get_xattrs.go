@@ -1,3 +1,7 @@
+// Copyright 2022 The searKing Author. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package webhdfs
 
 import (
@@ -8,7 +12,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/aws/aws-sdk-go/aws"
+	"github.com/searKing/golang/go/exp/types"
 
 	strings_ "github.com/searKing/golang/go/strings"
 
@@ -44,26 +48,26 @@ type GetXAttrsResponse struct {
 }
 
 func (req *GetXAttrsRequest) RawPath() string {
-	return aws.StringValue(req.Path)
+	return types.Value(req.Path)
 }
 func (req *GetXAttrsRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpGetXAttrs)
 	if req.Authentication.Delegation != nil {
-		v.Set("delegation", aws.StringValue(req.Authentication.Delegation))
+		v.Set("delegation", types.Value(req.Authentication.Delegation))
 	}
 	if req.ProxyUser.Username != nil {
-		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+		v.Set("user.name", types.Value(req.ProxyUser.Username))
 	}
 	if req.ProxyUser.DoAs != nil {
-		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+		v.Set("doas", types.Value(req.ProxyUser.DoAs))
 	}
 
 	for _, name := range req.XAttrNames {
 		v.Add(HttpQueryParamKeyXAttrName, name)
 	}
 	if req.Encoding != nil {
-		v.Set(HttpQueryParamKeyXAttrValueEncoding, aws.StringValue((*string)(req.Encoding)))
+		v.Set(HttpQueryParamKeyXAttrValueEncoding, types.Value((*string)(req.Encoding)))
 	}
 	return v.Encode()
 }
@@ -107,7 +111,7 @@ func (c *Client) getXAttrs(ctx context.Context, req *GetXAttrsRequest) (*GetXAtt
 		return nil, err
 	}
 	if req.Encoding != nil {
-		return nil, fmt.Errorf("unknown param %s : %s", HttpQueryParamKeyXAttrValueEncoding, aws.StringValue((*string)(req.Encoding)))
+		return nil, fmt.Errorf("unknown param %s : %s", HttpQueryParamKeyXAttrValueEncoding, types.Value((*string)(req.Encoding)))
 	}
 
 	nameNodes := c.opts.Addresses
@@ -126,7 +130,7 @@ func (c *Client) getXAttrs(ctx context.Context, req *GetXAttrsRequest) (*GetXAtt
 		}
 		httpReq.Close = req.HttpRequest.Close
 		if req.CSRF.XXsrfHeader != nil {
-			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+			httpReq.Header.Set("X-XSRF-HEADER", types.Value(req.CSRF.XXsrfHeader))
 		}
 		if ctx != nil {
 			httpReq = httpReq.WithContext(ctx)

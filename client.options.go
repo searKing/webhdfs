@@ -1,11 +1,15 @@
+// Copyright 2022 The searKing Author. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package webhdfs
 
 import (
 	"net/http"
 	"strings"
 
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/go-playground/validator/v10"
+	"github.com/searKing/golang/go/exp/types"
 
 	"github.com/searKing/webhdfs/kerberos"
 )
@@ -18,7 +22,7 @@ func withEndpoint(endpoint string) ClientOption {
 
 func withUsername(username string) ClientOption {
 	return ClientOptionFunc(func(c *Client) {
-		c.opts.Username = aws.String(username)
+		c.opts.Username = types.Pointer(username)
 	})
 }
 

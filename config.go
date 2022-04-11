@@ -1,10 +1,14 @@
+// Copyright 2022 The searKing Author. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package webhdfs
 
 import (
 	"strings"
 
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/go-playground/validator/v10"
+	"github.com/searKing/golang/go/exp/types"
 	path_ "github.com/searKing/golang/go/path"
 
 	http_ "github.com/searKing/webhdfs/http"
@@ -97,7 +101,7 @@ func (c completedConfig) proxyUser() *string {
 
 	i := strings.Index(username, string(path_.Separator))
 	if i >= 0 {
-		return aws.String(username[:i])
+		return types.Pointer(username[:i])
 	}
-	return aws.String(username)
+	return types.Pointer(username)
 }

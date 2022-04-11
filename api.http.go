@@ -1,3 +1,7 @@
+// Copyright 2022 The searKing Author. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package webhdfs
 
 import (
@@ -6,7 +10,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
+	"github.com/searKing/golang/go/exp/types"
 )
 
 type HttpRequest struct {
@@ -64,11 +68,11 @@ type HttpResponse struct {
 }
 
 func (resp *HttpResponse) UnmarshalHTTP(httpResp *http.Response) {
-	resp.ContentLength = aws.Int64(httpResp.ContentLength)
+	resp.ContentLength = types.Pointer(httpResp.ContentLength)
 	{
 		ct := httpResp.Header.Get("Content-Type")
 		if ct != "" {
-			resp.ContentType = aws.String(httpResp.Header.Get("Content-Type"))
+			resp.ContentType = types.Pointer(httpResp.Header.Get("Content-Type"))
 		}
 	}
 

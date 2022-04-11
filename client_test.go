@@ -17,7 +17,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
+	"github.com/searKing/golang/go/exp/types"
 
 	time_ "github.com/searKing/golang/go/time"
 
@@ -76,9 +76,9 @@ func TestClient_Open(t *testing.T) {
 	{
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -88,7 +88,7 @@ func TestClient_Open(t *testing.T) {
 	}
 	resp, err := c.Open(&webhdfs.OpenRequest{
 		ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-		Path:      aws.String(file),
+		Path:      types.Pointer(file),
 	})
 	if err != nil {
 		t.Fatalf("webhdfs Open failed: %s", err)
@@ -117,7 +117,7 @@ func TestClient_Open_NotFound(t *testing.T) {
 			c := getWebHDFSClient(t)
 			resp, err := c.Delete(&webhdfs.DeleteRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(file),
+				Path:      types.Pointer(file),
 			})
 			if err != nil {
 				t.Fatalf("webhdfs Delete failed: %s", err)
@@ -127,7 +127,7 @@ func TestClient_Open_NotFound(t *testing.T) {
 		}
 		resp, err := c.Open(&webhdfs.OpenRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
@@ -150,9 +150,9 @@ func TestClient_GetFileStatus_File(t *testing.T) {
 	{
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -163,7 +163,7 @@ func TestClient_GetFileStatus_File(t *testing.T) {
 	{ // File
 		resp, err := c.GetFileStatus(&webhdfs.GetFileStatusRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs GetFileStatus failed: %s", err)
@@ -191,7 +191,7 @@ func TestClient_GetFileStatus_Dir(t *testing.T) {
 	{
 		resp, err := c.Mkdirs(&webhdfs.MkdirsRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(dir),
+			Path:      types.Pointer(dir),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Mkdirs failed: %s", err)
@@ -202,7 +202,7 @@ func TestClient_GetFileStatus_Dir(t *testing.T) {
 	{ // Dir
 		resp, err := c.GetFileStatus(&webhdfs.GetFileStatusRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(dir),
+			Path:      types.Pointer(dir),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs GetFileStatus failed: %s", err)
@@ -230,7 +230,7 @@ func TestClient_GetFileStatus_File_NotFound(t *testing.T) {
 	{
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -241,7 +241,7 @@ func TestClient_GetFileStatus_File_NotFound(t *testing.T) {
 	{ // NotFound File
 		resp, err := c.GetFileStatus(&webhdfs.GetFileStatusRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 
 		if err != nil {
@@ -266,9 +266,9 @@ func TestClient_ListStatus_File(t *testing.T) {
 	{
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -279,7 +279,7 @@ func TestClient_ListStatus_File(t *testing.T) {
 	{
 		resp, err := c.ListStatus(&webhdfs.ListStatusRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs ListStatus failed: %s", err)
@@ -320,8 +320,8 @@ func TestClient_ListStatus_Dir(t *testing.T) {
 	func() { // remove root dir
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(root),
-			Recursive: aws.Bool(true),
+			Path:      types.Pointer(root),
+			Recursive: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -332,9 +332,9 @@ func TestClient_ListStatus_Dir(t *testing.T) {
 	for _, file := range files {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -345,7 +345,7 @@ func TestClient_ListStatus_Dir(t *testing.T) {
 	{
 		resp, err := c.ListStatus(&webhdfs.ListStatusRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(root),
+			Path:      types.Pointer(root),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs ListStatus failed: %s", err)
@@ -380,8 +380,8 @@ func TestClient_ListStatus_File_NotFound(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
-			Recursive: aws.Bool(true),
+			Path:      types.Pointer(file),
+			Recursive: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -392,7 +392,7 @@ func TestClient_ListStatus_File_NotFound(t *testing.T) {
 	{
 		resp, err := c.ListStatus(&webhdfs.ListStatusRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 
 		if err != nil {
@@ -419,9 +419,9 @@ func TestClient_ListStatusBatch_File(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -432,7 +432,7 @@ func TestClient_ListStatusBatch_File(t *testing.T) {
 	{
 		resp, err := c.ListStatusBatch(&webhdfs.ListStatusBatchRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs ListStatusBatch failed: %s", err)
@@ -475,8 +475,8 @@ func TestClient_ListStatusBatch_Dir(t *testing.T) {
 	func() { // remove root dir
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(root),
-			Recursive: aws.Bool(true),
+			Path:      types.Pointer(root),
+			Recursive: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -487,9 +487,9 @@ func TestClient_ListStatusBatch_Dir(t *testing.T) {
 	for _, file := range files {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -502,8 +502,8 @@ func TestClient_ListStatusBatch_Dir(t *testing.T) {
 	for {
 		resp, err := c.ListStatusBatch(&webhdfs.ListStatusBatchRequest{
 			ProxyUser:  c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:       aws.String(root),
-			StartAfter: aws.String(startAfter),
+			Path:       types.Pointer(root),
+			StartAfter: types.Pointer(startAfter),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs ListStatusBatch failed: %s", err)
@@ -536,8 +536,8 @@ func TestClient_ListStatusBatch_File_NotFound(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
-			Recursive: aws.Bool(true),
+			Path:      types.Pointer(file),
+			Recursive: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -548,7 +548,7 @@ func TestClient_ListStatusBatch_File_NotFound(t *testing.T) {
 	{
 		resp, err := c.ListStatusBatch(&webhdfs.ListStatusBatchRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 
 		if err != nil {
@@ -575,9 +575,9 @@ func TestClient_GetContentSummary_File(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -588,7 +588,7 @@ func TestClient_GetContentSummary_File(t *testing.T) {
 	{
 		resp, err := c.GetContentSummary(&webhdfs.GetContentSummaryRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs GetContentSummary failed: %s", err)
@@ -649,8 +649,8 @@ func TestClient_GetContentSummary_Dir(t *testing.T) {
 	func() { // remove root dir
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(root),
-			Recursive: aws.Bool(true),
+			Path:      types.Pointer(root),
+			Recursive: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -661,9 +661,9 @@ func TestClient_GetContentSummary_Dir(t *testing.T) {
 	for _, file := range files {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -675,7 +675,7 @@ func TestClient_GetContentSummary_Dir(t *testing.T) {
 	{
 		resp, err := c.GetContentSummary(&webhdfs.GetContentSummaryRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(root),
+			Path:      types.Pointer(root),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs GetContentSummary failed: %s", err)
@@ -713,8 +713,8 @@ func TestClient_GetContentSummary_File_NotFound(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
-			Recursive: aws.Bool(true),
+			Path:      types.Pointer(file),
+			Recursive: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -725,7 +725,7 @@ func TestClient_GetContentSummary_File_NotFound(t *testing.T) {
 	{
 		resp, err := c.GetContentSummary(&webhdfs.GetContentSummaryRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
@@ -749,7 +749,7 @@ func TestClient_GetQuotaUsage(t *testing.T) {
 	c := getWebHDFSClient(t)
 	resp, err := c.GetQuotaUsage(&webhdfs.GetQuotaUsageRequest{
 		ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-		Path:      aws.String("/data/test"),
+		Path:      types.Pointer("/data/test"),
 	})
 	if err != nil {
 		t.Fatalf("webhdfs GetQuotaUsage failed: %s", err)
@@ -791,9 +791,9 @@ func TestClient_GetFileChecksum(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -804,7 +804,7 @@ func TestClient_GetFileChecksum(t *testing.T) {
 	{
 		resp, err := c.GetFileChecksum(&webhdfs.GetFileChecksumRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs GetFileChecksum failed: %s", err)
@@ -831,8 +831,8 @@ func TestClient_GetFileChecksum_File_NotFound(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
-			Recursive: aws.Bool(true),
+			Path:      types.Pointer(file),
+			Recursive: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -843,7 +843,7 @@ func TestClient_GetFileChecksum_File_NotFound(t *testing.T) {
 	{
 		resp, err := c.GetFileChecksum(&webhdfs.GetFileChecksumRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
@@ -882,7 +882,7 @@ func TestClient_GetTrashRoot(t *testing.T) {
 	file := HdfsBucket + "/test/notfound.txt"
 	resp, err := c.GetTrashRoot(&webhdfs.GetTrashRootRequest{
 		ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-		Path:      aws.String(file),
+		Path:      types.Pointer(file),
 	})
 	if err != nil {
 		t.Fatalf("webhdfs GetTrashRoot failed: %s", err)
@@ -901,9 +901,9 @@ func TestClient_GetXAttr(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -914,9 +914,9 @@ func TestClient_GetXAttr(t *testing.T) {
 	func() {
 		resp, err := c.SetXAttr(&webhdfs.SetXAttrRequest{
 			ProxyUser:  c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:       aws.String(file),
-			XAttrName:  aws.String(XAttrName),
-			XAttrValue: aws.String(XAttrValue),
+			Path:       types.Pointer(file),
+			XAttrName:  types.Pointer(XAttrName),
+			XAttrValue: types.Pointer(XAttrValue),
 			XAttrFlag:  webhdfs.XAttrSetFlagCreate.New(),
 		})
 		if err != nil {
@@ -927,8 +927,8 @@ func TestClient_GetXAttr(t *testing.T) {
 	func() {
 		resp, err := c.GetXAttr(&webhdfs.GetXAttrRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
-			XAttrName: aws.String(XAttrName),
+			Path:      types.Pointer(file),
+			XAttrName: types.Pointer(XAttrName),
 			//Encoding:  webhdfs.XAttrValueEncodingText.New(),
 		})
 		if err != nil {
@@ -958,9 +958,9 @@ func TestClient_GetXAttrs(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -971,9 +971,9 @@ func TestClient_GetXAttrs(t *testing.T) {
 	func() {
 		resp, err := c.SetXAttr(&webhdfs.SetXAttrRequest{
 			ProxyUser:  c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:       aws.String(file),
-			XAttrName:  aws.String(XAttrName),
-			XAttrValue: aws.String(XAttrValue),
+			Path:       types.Pointer(file),
+			XAttrName:  types.Pointer(XAttrName),
+			XAttrValue: types.Pointer(XAttrValue),
 			XAttrFlag:  webhdfs.XAttrSetFlagCreate.New(),
 		})
 		if err != nil {
@@ -984,7 +984,7 @@ func TestClient_GetXAttrs(t *testing.T) {
 	func() {
 		resp, err := c.GetXAttrs(&webhdfs.GetXAttrsRequest{
 			ProxyUser:  c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:       aws.String(file),
+			Path:       types.Pointer(file),
 			XAttrNames: []string{webhdfs.XAttrNamespaceUser.String() + ".name"},
 			//Encoding:   webhdfs.XAttrValueEncodingText.New(),
 		})
@@ -1015,9 +1015,9 @@ func TestClient_GetAllXAttrs(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -1028,9 +1028,9 @@ func TestClient_GetAllXAttrs(t *testing.T) {
 	func() {
 		resp, err := c.SetXAttr(&webhdfs.SetXAttrRequest{
 			ProxyUser:  c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:       aws.String(file),
-			XAttrName:  aws.String(XAttrName),
-			XAttrValue: aws.String(XAttrValue),
+			Path:       types.Pointer(file),
+			XAttrName:  types.Pointer(XAttrName),
+			XAttrValue: types.Pointer(XAttrValue),
 			XAttrFlag:  webhdfs.XAttrSetFlagCreate.New(),
 		})
 		if err != nil {
@@ -1041,7 +1041,7 @@ func TestClient_GetAllXAttrs(t *testing.T) {
 	func() {
 		resp, err := c.GetAllXAttrs(&webhdfs.GetAllXAttrsRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			//Encoding:  webhdfs.XAttrValueEncodingText.New(),
 		})
 		if err != nil {
@@ -1071,9 +1071,9 @@ func TestClient_ListXAttrs(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -1084,9 +1084,9 @@ func TestClient_ListXAttrs(t *testing.T) {
 	func() {
 		resp, err := c.SetXAttr(&webhdfs.SetXAttrRequest{
 			ProxyUser:  c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:       aws.String(file),
-			XAttrName:  aws.String(XAttrName),
-			XAttrValue: aws.String(XAttrValue),
+			Path:       types.Pointer(file),
+			XAttrName:  types.Pointer(XAttrName),
+			XAttrValue: types.Pointer(XAttrValue),
 			XAttrFlag:  webhdfs.XAttrSetFlagCreate.New(),
 		})
 		if err != nil {
@@ -1097,7 +1097,7 @@ func TestClient_ListXAttrs(t *testing.T) {
 	func() {
 		resp, err := c.ListXAttrs(&webhdfs.ListXAttrsRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs ListXAttrs failed: %s", err)
@@ -1128,9 +1128,9 @@ func TestClient_CheckAccess(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -1142,8 +1142,8 @@ func TestClient_CheckAccess(t *testing.T) {
 	func() {
 		resp, err := c.CheckAccess(&webhdfs.CheckAccessRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
-			Fsaction:  aws.String("rwx"),
+			Path:      types.Pointer(file),
+			Fsaction:  types.Pointer("rwx"),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs CheckAccess failed: %s", err)
@@ -1286,9 +1286,9 @@ func TestClient_GetStoragePolicy(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -1299,7 +1299,7 @@ func TestClient_GetStoragePolicy(t *testing.T) {
 	func() {
 		resp, err := c.GetStoragePolicy(&webhdfs.GetStoragePolicyRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs GetStoragePolicy failed: %s", err)
@@ -1335,7 +1335,7 @@ func TestClient_GetSnapshotDiff(t *testing.T) {
 		func() {
 			resp, err := c.Mkdirs(&webhdfs.MkdirsRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
+				Path:      types.Pointer(dir),
 			})
 			if err != nil {
 				return
@@ -1345,7 +1345,7 @@ func TestClient_GetSnapshotDiff(t *testing.T) {
 		func() {
 			resp, err := c.AllowSnapshot(&webhdfs.AllowSnapshotRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
+				Path:      types.Pointer(dir),
 			})
 			if err != nil {
 				return
@@ -1355,8 +1355,8 @@ func TestClient_GetSnapshotDiff(t *testing.T) {
 		func() {
 			resp, err := c.DeleteSnapshot(&webhdfs.DeleteSnapshotRequest{
 				ProxyUser:    c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:         aws.String(dir),
-				Snapshotname: aws.String("snapshot.old"),
+				Path:         types.Pointer(dir),
+				Snapshotname: types.Pointer("snapshot.old"),
 			})
 			if err != nil {
 				return
@@ -1366,8 +1366,8 @@ func TestClient_GetSnapshotDiff(t *testing.T) {
 		func() {
 			resp, err := c.DeleteSnapshot(&webhdfs.DeleteSnapshotRequest{
 				ProxyUser:    c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:         aws.String(dir),
-				Snapshotname: aws.String("snapshot.new"),
+				Path:         types.Pointer(dir),
+				Snapshotname: types.Pointer("snapshot.new"),
 			})
 			if err != nil {
 				return
@@ -1377,21 +1377,21 @@ func TestClient_GetSnapshotDiff(t *testing.T) {
 		func() {
 			resp, err := c.CreateSnapshot(&webhdfs.CreateSnapshotRequest{
 				ProxyUser:    c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:         aws.String(dir),
-				Snapshotname: aws.String("snapshot.old"),
+				Path:         types.Pointer(dir),
+				Snapshotname: types.Pointer("snapshot.old"),
 			})
 			if err != nil {
 				t.Fatalf("webhdfs CreateSnapshot failed: %s", err)
 			}
 			defer resp.Body.Close()
-			t.Logf("snapshot.old created: %s", aws.StringValue(resp.Path))
+			t.Logf("snapshot.old created: %s", types.Value(resp.Path))
 		}()
 		func() {
 			resp, err := c.Create(&webhdfs.CreateRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(path.Join(dir, "found.txt")),
+				Path:      types.Pointer(path.Join(dir, "found.txt")),
 				Body:      strings.NewReader("Hello World!"),
-				Overwrite: aws.Bool(true),
+				Overwrite: types.Pointer(true),
 			})
 			if err != nil {
 				t.Fatalf("webhdfs Create failed: %s", err)
@@ -1402,22 +1402,22 @@ func TestClient_GetSnapshotDiff(t *testing.T) {
 		func() {
 			resp, err := c.CreateSnapshot(&webhdfs.CreateSnapshotRequest{
 				ProxyUser:    c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:         aws.String(dir),
-				Snapshotname: aws.String("snapshot.new"),
+				Path:         types.Pointer(dir),
+				Snapshotname: types.Pointer("snapshot.new"),
 			})
 			if err != nil {
 				return
 			}
 			defer resp.Body.Close()
-			t.Logf("snapshot.new created: %s", aws.StringValue(resp.Path))
+			t.Logf("snapshot.new created: %s", types.Value(resp.Path))
 		}()
 	}()
 	func() {
 		resp, err := c.GetSnapshotDiff(&webhdfs.GetSnapshotDiffRequest{
 			ProxyUser:       c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:            aws.String(dir),
-			Oldsnapshotname: aws.String("snapshot.old"),
-			Snapshotname:    aws.String("snapshot.new"),
+			Path:            types.Pointer(dir),
+			Oldsnapshotname: types.Pointer("snapshot.old"),
+			Snapshotname:    types.Pointer("snapshot.new"),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs GetSnapshotDiff failed: %s", err)
@@ -1463,7 +1463,7 @@ func TestClient_GetSnapshottableDirectoryList(t *testing.T) {
 		func() {
 			resp, err := c.Mkdirs(&webhdfs.MkdirsRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
+				Path:      types.Pointer(dir),
 			})
 			if err != nil {
 				return
@@ -1473,7 +1473,7 @@ func TestClient_GetSnapshottableDirectoryList(t *testing.T) {
 		func() {
 			resp, err := c.AllowSnapshot(&webhdfs.AllowSnapshotRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
+				Path:      types.Pointer(dir),
 			})
 			if err != nil {
 				return
@@ -1483,8 +1483,8 @@ func TestClient_GetSnapshottableDirectoryList(t *testing.T) {
 		func() {
 			resp, err := c.DeleteSnapshot(&webhdfs.DeleteSnapshotRequest{
 				ProxyUser:    c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:         aws.String(dir),
-				Snapshotname: aws.String("snapshot.old"),
+				Path:         types.Pointer(dir),
+				Snapshotname: types.Pointer("snapshot.old"),
 			})
 			if err != nil {
 				return
@@ -1494,8 +1494,8 @@ func TestClient_GetSnapshottableDirectoryList(t *testing.T) {
 		func() {
 			resp, err := c.DeleteSnapshot(&webhdfs.DeleteSnapshotRequest{
 				ProxyUser:    c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:         aws.String(dir),
-				Snapshotname: aws.String("snapshot.new"),
+				Path:         types.Pointer(dir),
+				Snapshotname: types.Pointer("snapshot.new"),
 			})
 			if err != nil {
 				return
@@ -1505,21 +1505,21 @@ func TestClient_GetSnapshottableDirectoryList(t *testing.T) {
 		func() {
 			resp, err := c.CreateSnapshot(&webhdfs.CreateSnapshotRequest{
 				ProxyUser:    c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:         aws.String(dir),
-				Snapshotname: aws.String("snapshot.old"),
+				Path:         types.Pointer(dir),
+				Snapshotname: types.Pointer("snapshot.old"),
 			})
 			if err != nil {
 				t.Fatalf("webhdfs CreateSnapshot failed: %s", err)
 			}
 			defer resp.Body.Close()
-			t.Logf("snapshot.old created: %s", aws.StringValue(resp.Path))
+			t.Logf("snapshot.old created: %s", types.Value(resp.Path))
 		}()
 		func() {
 			resp, err := c.Create(&webhdfs.CreateRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(path.Join(dir, "found.txt")),
+				Path:      types.Pointer(path.Join(dir, "found.txt")),
 				Body:      strings.NewReader("Hello World!"),
-				Overwrite: aws.Bool(true),
+				Overwrite: types.Pointer(true),
 			})
 			if err != nil {
 				t.Fatalf("webhdfs Create failed: %s", err)
@@ -1530,14 +1530,14 @@ func TestClient_GetSnapshottableDirectoryList(t *testing.T) {
 		func() {
 			resp, err := c.CreateSnapshot(&webhdfs.CreateSnapshotRequest{
 				ProxyUser:    c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:         aws.String(dir),
-				Snapshotname: aws.String("snapshot.new"),
+				Path:         types.Pointer(dir),
+				Snapshotname: types.Pointer("snapshot.new"),
 			})
 			if err != nil {
 				return
 			}
 			defer resp.Body.Close()
-			t.Logf("snapshot.new created: %s", aws.StringValue(resp.Path))
+			t.Logf("snapshot.new created: %s", types.Value(resp.Path))
 		}()
 	}()
 	func() {
@@ -1589,9 +1589,9 @@ func TestClient_GetFileBlockLocations(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -1603,7 +1603,7 @@ func TestClient_GetFileBlockLocations(t *testing.T) {
 	func() {
 		resp, err := c.GetFileBlockLocations(&webhdfs.GetFileBlockLocationsRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs GetFileBlockLocations failed: %s", err)
@@ -1625,9 +1625,9 @@ func TestClient_GetECPolicy(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -1638,7 +1638,7 @@ func TestClient_GetECPolicy(t *testing.T) {
 	func() {
 		resp, err := c.GetECPolicy(&webhdfs.GetECPolicyRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String("/data/test/core-site.xml"),
+			Path:      types.Pointer("/data/test/core-site.xml"),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs GetFileBlockLocations failed: %s", err)
@@ -1660,7 +1660,7 @@ func TestClient_Create_File_Overwrite(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -1671,9 +1671,9 @@ func TestClient_Create_File_Overwrite(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -1684,9 +1684,9 @@ func TestClient_Create_File_Overwrite(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -1697,7 +1697,7 @@ func TestClient_Create_File_Overwrite(t *testing.T) {
 	func() {
 		resp, err := c.Open(&webhdfs.OpenRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Open failed: %s", err)
@@ -1725,7 +1725,7 @@ func TestClient_Create_File_AlreadyExist(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -1736,9 +1736,9 @@ func TestClient_Create_File_AlreadyExist(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -1749,9 +1749,9 @@ func TestClient_Create_File_AlreadyExist(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(false),
+			Overwrite: types.Pointer(false),
 		})
 		if err != nil {
 			if errors.Is(err, os.ErrExist) {
@@ -1774,7 +1774,7 @@ func TestClient_Create_Dir(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -1785,9 +1785,9 @@ func TestClient_Create_Dir(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -1799,7 +1799,7 @@ func TestClient_Create_Dir(t *testing.T) {
 	func() { //test.bucket/test.create_dir/
 		resp, err := c.Open(&webhdfs.OpenRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Open failed: %s", err)
@@ -1820,7 +1820,7 @@ func TestClient_Create_Dir(t *testing.T) {
 	func() { //test.bucket/test.create_dir
 		resp, err := c.Open(&webhdfs.OpenRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(path.Clean(file)),
+			Path:      types.Pointer(path.Clean(file)),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Open failed: %s", err)
@@ -1849,8 +1849,8 @@ func TestClient_Mkdirs(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(dir),
-			Recursive: aws.Bool(true),
+			Path:      types.Pointer(dir),
+			Recursive: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -1861,7 +1861,7 @@ func TestClient_Mkdirs(t *testing.T) {
 	{
 		resp, err := c.Mkdirs(&webhdfs.MkdirsRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(dir),
+			Path:      types.Pointer(dir),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Mkdirs failed: %s", err)
@@ -1876,7 +1876,7 @@ func TestClient_Mkdirs(t *testing.T) {
 	{
 		resp, err := c.GetFileStatus(&webhdfs.GetFileStatusRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(dir),
+			Path:      types.Pointer(dir),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Open failed: %s", err)
@@ -1897,7 +1897,7 @@ func TestClient_CreateSymlink(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -1908,9 +1908,9 @@ func TestClient_CreateSymlink(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -1921,8 +1921,8 @@ func TestClient_CreateSymlink(t *testing.T) {
 	{
 		resp, err := c.CreateSymlink(&webhdfs.CreateSymlinkRequest{
 			ProxyUser:   c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:        aws.String(file),
-			Destination: aws.String(link),
+			Path:        types.Pointer(file),
+			Destination: types.Pointer(link),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs CreateSymlink failed: %s", err)
@@ -1933,7 +1933,7 @@ func TestClient_CreateSymlink(t *testing.T) {
 	{
 		resp, err := c.GetFileStatus(&webhdfs.GetFileStatusRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(link),
+			Path:      types.Pointer(link),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs GetFileStatus failed: %s", err)
@@ -1946,7 +1946,7 @@ func TestClient_CreateSymlink(t *testing.T) {
 	func() {
 		resp, err := c.Open(&webhdfs.OpenRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(link),
+			Path:      types.Pointer(link),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Open failed: %s", err)
@@ -1978,7 +1978,7 @@ func TestClient_Rename(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -1989,9 +1989,9 @@ func TestClient_Rename(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -2002,7 +2002,7 @@ func TestClient_Rename(t *testing.T) {
 	func() {
 		resp, err := c.Open(&webhdfs.OpenRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Open failed: %s", err)
@@ -2023,8 +2023,8 @@ func TestClient_Rename(t *testing.T) {
 	func() {
 		resp, err := c.Rename(&webhdfs.RenameRequest{
 			ProxyUser:   c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:        aws.String(file),
-			Destination: aws.String(link),
+			Path:        types.Pointer(file),
+			Destination: types.Pointer(link),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs CreateSymlink failed: %s", err)
@@ -2038,7 +2038,7 @@ func TestClient_Rename(t *testing.T) {
 			func() {
 				resp, err := c.GetFileStatus(&webhdfs.GetFileStatusRequest{
 					ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-					Path:      aws.String(link),
+					Path:      types.Pointer(link),
 				})
 				if err != nil {
 					t.Fatalf("webhdfs GetFileStatus failed: %s", err)
@@ -2051,7 +2051,7 @@ func TestClient_Rename(t *testing.T) {
 			func() {
 				resp, err := c.Open(&webhdfs.OpenRequest{
 					ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-					Path:      aws.String(link),
+					Path:      types.Pointer(link),
 				})
 				if err != nil {
 					t.Fatalf("webhdfs Open failed: %s", err)
@@ -2081,7 +2081,7 @@ func TestClient_SetReplication(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -2092,9 +2092,9 @@ func TestClient_SetReplication(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -2105,8 +2105,8 @@ func TestClient_SetReplication(t *testing.T) {
 	func() {
 		resp, err := c.SetReplication(&webhdfs.SetReplicationRequest{
 			ProxyUser:   c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:        aws.String(file),
-			Replication: aws.Int(2),
+			Path:        types.Pointer(file),
+			Replication: types.Pointer(2),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Open failed: %s", err)
@@ -2125,7 +2125,7 @@ func TestClient_SetOwner(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -2136,9 +2136,9 @@ func TestClient_SetOwner(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -2149,8 +2149,8 @@ func TestClient_SetOwner(t *testing.T) {
 	func() {
 		resp, err := c.SetOwner(&webhdfs.SetOwnerRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
-			Owner:     aws.String(owner),
+			Path:      types.Pointer(file),
+			Owner:     types.Pointer(owner),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs SetOwner failed: %s", err)
@@ -2160,7 +2160,7 @@ func TestClient_SetOwner(t *testing.T) {
 	func() {
 		resp, err := c.ListStatus(&webhdfs.ListStatusRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs ListStatus failed: %s", err)
@@ -2190,7 +2190,7 @@ func TestClient_SetPermission(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -2201,9 +2201,9 @@ func TestClient_SetPermission(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -2214,7 +2214,7 @@ func TestClient_SetPermission(t *testing.T) {
 	func() {
 		resp, err := c.SetPermission(&webhdfs.SetPermissionRequest{
 			ProxyUser:  c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:       aws.String(file),
+			Path:       types.Pointer(file),
 			Permission: perm.New(),
 		})
 		if err != nil {
@@ -2225,7 +2225,7 @@ func TestClient_SetPermission(t *testing.T) {
 	func() {
 		resp, err := c.ListStatus(&webhdfs.ListStatusRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs ListStatus failed: %s", err)
@@ -2255,7 +2255,7 @@ func TestClient_SetTimes(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -2266,9 +2266,9 @@ func TestClient_SetTimes(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -2279,7 +2279,7 @@ func TestClient_SetTimes(t *testing.T) {
 	func() {
 		resp, err := c.SetTimes(&webhdfs.SetTimesRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Modificationtime: &time_.UnixTimeMillisecond{
 				Time: now,
 			},
@@ -2292,7 +2292,7 @@ func TestClient_SetTimes(t *testing.T) {
 	func() {
 		resp, err := c.ListStatus(&webhdfs.ListStatusRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs ListStatus failed: %s", err)
@@ -2332,7 +2332,7 @@ func TestClient_RenewDelegationToken(t *testing.T) {
 	func() {
 		resp, err := c.RenewDelegationToken(&webhdfs.RenewDelegationTokenRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Token:     aws.String(token),
+			Token:     types.Pointer(token),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs RenewDelegationToken failed: %s", err)
@@ -2362,7 +2362,7 @@ func TestClient_CancelDelegationToken(t *testing.T) {
 	func() {
 		resp, err := c.CancelDelegationToken(&webhdfs.CancelDelegationTokenRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Token:     aws.String(token),
+			Token:     types.Pointer(token),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs CancelDelegationToken failed: %s", err)
@@ -2372,7 +2372,7 @@ func TestClient_CancelDelegationToken(t *testing.T) {
 	func() {
 		resp, err := c.RenewDelegationToken(&webhdfs.RenewDelegationTokenRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Token:     aws.String(token),
+			Token:     types.Pointer(token),
 		})
 		if err != nil {
 			t.Logf("webhdfs RenewDelegationToken failed: %s", err)
@@ -2394,7 +2394,7 @@ func TestClient_AllowSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.Mkdirs(&webhdfs.MkdirsRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
+				Path:      types.Pointer(dir),
 			})
 			if err != nil {
 				return
@@ -2404,7 +2404,7 @@ func TestClient_AllowSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.AllowSnapshot(&webhdfs.AllowSnapshotRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
+				Path:      types.Pointer(dir),
 			})
 			if err != nil {
 				return
@@ -2414,8 +2414,8 @@ func TestClient_AllowSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.DeleteSnapshot(&webhdfs.DeleteSnapshotRequest{
 				ProxyUser:    c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:         aws.String(dir),
-				Snapshotname: aws.String(snapshot),
+				Path:         types.Pointer(dir),
+				Snapshotname: types.Pointer(snapshot),
 			})
 			if err != nil {
 				return
@@ -2425,14 +2425,14 @@ func TestClient_AllowSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.CreateSnapshot(&webhdfs.CreateSnapshotRequest{
 				ProxyUser:    c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:         aws.String(dir),
-				Snapshotname: aws.String(snapshot),
+				Path:         types.Pointer(dir),
+				Snapshotname: types.Pointer(snapshot),
 			})
 			if err != nil {
 				t.Fatalf("webhdfs CreateSnapshot failed: %s", err)
 			}
 			defer resp.Body.Close()
-			t.Logf("%s created: %s", snapshot, aws.StringValue(resp.Path))
+			t.Logf("%s created: %s", snapshot, types.Value(resp.Path))
 		}()
 	}()
 	//    client_test.go:2422: snapshot created: /test.bucket/test/.snapshot/snapshot
@@ -2446,8 +2446,8 @@ func TestClient_DisallowSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.Delete(&webhdfs.DeleteRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
-				Recursive: aws.Bool(true),
+				Path:      types.Pointer(dir),
+				Recursive: types.Pointer(true),
 			})
 			if err != nil {
 				return
@@ -2457,7 +2457,7 @@ func TestClient_DisallowSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.Mkdirs(&webhdfs.MkdirsRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
+				Path:      types.Pointer(dir),
 			})
 			if err != nil {
 				return
@@ -2467,7 +2467,7 @@ func TestClient_DisallowSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.DisallowSnapshot(&webhdfs.DisallowSnapshotRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
+				Path:      types.Pointer(dir),
 			})
 			if err != nil {
 				t.Fatalf("webhdfs DisallowSnapshot failed: %s", err)
@@ -2478,15 +2478,15 @@ func TestClient_DisallowSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.CreateSnapshot(&webhdfs.CreateSnapshotRequest{
 				ProxyUser:    c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:         aws.String(dir),
-				Snapshotname: aws.String(snapshot),
+				Path:         types.Pointer(dir),
+				Snapshotname: types.Pointer(snapshot),
 			})
 			if err != nil {
 				t.Logf("webhdfs CreateSnapshot failed: %s", err)
 				return
 			}
 			defer resp.Body.Close()
-			t.Errorf("%s created: %s", snapshot, aws.StringValue(resp.Path))
+			t.Errorf("%s created: %s", snapshot, types.Value(resp.Path))
 		}()
 	}()
 	//    client_test.go:2473: webhdfs CreateSnapshot failed: SnapshotException: Directory is not a snapshottable directory: /test.bucket/test663134000 in org.apache.hadoop.hdfs.protocol.SnapshotException
@@ -2500,8 +2500,8 @@ func TestClient_DisallowSnapshot_SubDir(t *testing.T) {
 		func() {
 			resp, err := c.Delete(&webhdfs.DeleteRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
-				Recursive: aws.Bool(true),
+				Path:      types.Pointer(dir),
+				Recursive: types.Pointer(true),
 			})
 			if err != nil {
 				return
@@ -2511,7 +2511,7 @@ func TestClient_DisallowSnapshot_SubDir(t *testing.T) {
 		func() {
 			resp, err := c.Mkdirs(&webhdfs.MkdirsRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
+				Path:      types.Pointer(dir),
 			})
 			if err != nil {
 				return
@@ -2521,7 +2521,7 @@ func TestClient_DisallowSnapshot_SubDir(t *testing.T) {
 		func() {
 			resp, err := c.AllowSnapshot(&webhdfs.AllowSnapshotRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
+				Path:      types.Pointer(dir),
 			})
 			if err != nil {
 				t.Logf("webhdfs AllowSnapshot failed: %s", err)
@@ -2532,20 +2532,20 @@ func TestClient_DisallowSnapshot_SubDir(t *testing.T) {
 		func() {
 			resp, err := c.CreateSnapshot(&webhdfs.CreateSnapshotRequest{
 				ProxyUser:    c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:         aws.String(dir),
-				Snapshotname: aws.String(snapshot),
+				Path:         types.Pointer(dir),
+				Snapshotname: types.Pointer(snapshot),
 			})
 			if err != nil {
 				t.Fatalf("webhdfs CreateSnapshot failed: %s", err)
 				return
 			}
 			defer resp.Body.Close()
-			t.Logf("%s created: %s", snapshot, aws.StringValue(resp.Path))
+			t.Logf("%s created: %s", snapshot, types.Value(resp.Path))
 		}()
 		func() {
 			resp, err := c.DisallowSnapshot(&webhdfs.DisallowSnapshotRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
+				Path:      types.Pointer(dir),
 			})
 			if err != nil {
 				t.Logf("webhdfs DisallowSnapshot failed: %s", err)
@@ -2567,8 +2567,8 @@ func TestClient_CreateSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.Delete(&webhdfs.DeleteRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
-				Recursive: aws.Bool(true),
+				Path:      types.Pointer(dir),
+				Recursive: types.Pointer(true),
 			})
 			if err != nil {
 				return
@@ -2578,7 +2578,7 @@ func TestClient_CreateSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.Mkdirs(&webhdfs.MkdirsRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
+				Path:      types.Pointer(dir),
 			})
 			if err != nil {
 				return
@@ -2588,7 +2588,7 @@ func TestClient_CreateSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.AllowSnapshot(&webhdfs.AllowSnapshotRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
+				Path:      types.Pointer(dir),
 			})
 			if err != nil {
 				return
@@ -2598,15 +2598,15 @@ func TestClient_CreateSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.CreateSnapshot(&webhdfs.CreateSnapshotRequest{
 				ProxyUser:    c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:         aws.String(dir),
-				Snapshotname: aws.String(snapshot),
+				Path:         types.Pointer(dir),
+				Snapshotname: types.Pointer(snapshot),
 			})
 			if err != nil {
 				t.Fatalf("webhdfs CreateSnapshot failed: %s", err)
 				return
 			}
 			defer resp.Body.Close()
-			t.Logf("%s created: %s", snapshot, aws.StringValue(resp.Path))
+			t.Logf("%s created: %s", snapshot, types.Value(resp.Path))
 		}()
 	}()
 	//    client_test.go:2597: snapshot created: /test.bucket/test582766000/.snapshot/snapshot
@@ -2621,8 +2621,8 @@ func TestClient_RenameSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.Delete(&webhdfs.DeleteRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
-				Recursive: aws.Bool(true),
+				Path:      types.Pointer(dir),
+				Recursive: types.Pointer(true),
 			})
 			if err != nil {
 				return
@@ -2632,7 +2632,7 @@ func TestClient_RenameSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.Mkdirs(&webhdfs.MkdirsRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
+				Path:      types.Pointer(dir),
 			})
 			if err != nil {
 				return
@@ -2642,7 +2642,7 @@ func TestClient_RenameSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.AllowSnapshot(&webhdfs.AllowSnapshotRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
+				Path:      types.Pointer(dir),
 			})
 			if err != nil {
 				return
@@ -2652,23 +2652,23 @@ func TestClient_RenameSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.CreateSnapshot(&webhdfs.CreateSnapshotRequest{
 				ProxyUser:    c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:         aws.String(dir),
-				Snapshotname: aws.String(oldSnapshot),
+				Path:         types.Pointer(dir),
+				Snapshotname: types.Pointer(oldSnapshot),
 			})
 			if err != nil {
 				t.Fatalf("webhdfs CreateSnapshot failed: %s", err)
 				return
 			}
 			defer resp.Body.Close()
-			t.Logf("%s created: %s", oldSnapshot, aws.StringValue(resp.Path))
+			t.Logf("%s created: %s", oldSnapshot, types.Value(resp.Path))
 		}()
 	}()
 	func() {
 		resp, err := c.RenameSnapshot(&webhdfs.RenameSnapshotRequest{
 			ProxyUser:       c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:            aws.String(dir),
-			Oldsnapshotname: aws.String(oldSnapshot),
-			Snapshotname:    aws.String(newSnapshot),
+			Path:            types.Pointer(dir),
+			Oldsnapshotname: types.Pointer(oldSnapshot),
+			Snapshotname:    types.Pointer(newSnapshot),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs CreateSnapshot failed: %s", err)
@@ -2694,9 +2694,9 @@ func TestClient_RemoveXAttr(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -2707,9 +2707,9 @@ func TestClient_RemoveXAttr(t *testing.T) {
 	func() {
 		resp, err := c.SetXAttr(&webhdfs.SetXAttrRequest{
 			ProxyUser:  c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:       aws.String(file),
-			XAttrName:  aws.String(XAttrName),
-			XAttrValue: aws.String(XAttrValue),
+			Path:       types.Pointer(file),
+			XAttrName:  types.Pointer(XAttrName),
+			XAttrValue: types.Pointer(XAttrValue),
 			XAttrFlag:  webhdfs.XAttrSetFlagCreate.New(),
 		})
 		if err != nil {
@@ -2720,7 +2720,7 @@ func TestClient_RemoveXAttr(t *testing.T) {
 	func() {
 		resp, err := c.ListXAttrs(&webhdfs.ListXAttrsRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs ListXAttrs failed: %s", err)
@@ -2743,8 +2743,8 @@ func TestClient_RemoveXAttr(t *testing.T) {
 	func() {
 		resp, err := c.RemoveXAttr(&webhdfs.RemoveXAttrRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
-			XAttrName: aws.String(XAttrName),
+			Path:      types.Pointer(file),
+			XAttrName: types.Pointer(XAttrName),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs RemoveXAttr failed: %s", err)
@@ -2754,7 +2754,7 @@ func TestClient_RemoveXAttr(t *testing.T) {
 	func() {
 		resp, err := c.ListXAttrs(&webhdfs.ListXAttrsRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs ListXAttrs failed: %s", err)
@@ -2777,8 +2777,8 @@ func TestClient_RemoveXAttr(t *testing.T) {
 	func() {
 		resp, err := c.RemoveXAttr(&webhdfs.RemoveXAttrRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
-			XAttrName: aws.String(XAttrName),
+			Path:      types.Pointer(file),
+			XAttrName: types.Pointer(XAttrName),
 		})
 		if err != nil {
 			t.Logf("webhdfs RemoveXAttr failed: %s", err)
@@ -2802,9 +2802,9 @@ func TestClient_SetStoragePolicy(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -2815,7 +2815,7 @@ func TestClient_SetStoragePolicy(t *testing.T) {
 	func() {
 		resp, err := c.GetStoragePolicy(&webhdfs.GetStoragePolicyRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs GetStoragePolicy failed: %s", err)
@@ -2832,8 +2832,8 @@ func TestClient_SetStoragePolicy(t *testing.T) {
 	func() {
 		resp, err := c.SetStoragePolicy(&webhdfs.SetStoragePolicyRequest{
 			ProxyUser:     c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:          aws.String(file),
-			StoragePolicy: aws.String("HOT"),
+			Path:          types.Pointer(file),
+			StoragePolicy: types.Pointer("HOT"),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs SetStoragePolicy failed: %s", err)
@@ -2843,7 +2843,7 @@ func TestClient_SetStoragePolicy(t *testing.T) {
 	func() {
 		resp, err := c.GetStoragePolicy(&webhdfs.GetStoragePolicyRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs GetStoragePolicy failed: %s", err)
@@ -2898,9 +2898,9 @@ func TestClient_SatisfyStoragePolicy(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -2911,7 +2911,7 @@ func TestClient_SatisfyStoragePolicy(t *testing.T) {
 	func() {
 		resp, err := c.GetStoragePolicy(&webhdfs.GetStoragePolicyRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs GetStoragePolicy failed: %s", err)
@@ -2922,8 +2922,8 @@ func TestClient_SatisfyStoragePolicy(t *testing.T) {
 	func() {
 		resp, err := c.SetStoragePolicy(&webhdfs.SetStoragePolicyRequest{
 			ProxyUser:     c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:          aws.String(file),
-			StoragePolicy: aws.String(policyName),
+			Path:          types.Pointer(file),
+			StoragePolicy: types.Pointer(policyName),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs SetStoragePolicy failed: %s", err)
@@ -2933,7 +2933,7 @@ func TestClient_SatisfyStoragePolicy(t *testing.T) {
 	func() {
 		resp, err := c.GetStoragePolicy(&webhdfs.GetStoragePolicyRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs GetStoragePolicy failed: %s", err)
@@ -2952,8 +2952,8 @@ func TestClient_SatisfyStoragePolicy(t *testing.T) {
 	func() {
 		resp, err := c.SatisfyStoragePolicy(&webhdfs.SatisfyStoragePolicyRequest{
 			ProxyUser:     c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:          aws.String(file),
-			StoragePolicy: aws.String(policyName),
+			Path:          types.Pointer(file),
+			StoragePolicy: types.Pointer(policyName),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs SatisfyStoragePolicy failed: %s", err)
@@ -2974,7 +2974,7 @@ func TestClient_EnableECPolicy(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -2985,9 +2985,9 @@ func TestClient_EnableECPolicy(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -2999,7 +2999,7 @@ func TestClient_EnableECPolicy(t *testing.T) {
 		func() {
 			resp, err := c.GetECPolicy(&webhdfs.GetECPolicyRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(file),
+				Path:      types.Pointer(file),
 			})
 			if err != nil {
 				t.Fatalf("webhdfs GetECPolicy"+
@@ -3025,7 +3025,7 @@ func TestClient_EnableECPolicy(t *testing.T) {
 		func() {
 			resp, err := c.SetECPolicy(&webhdfs.SetECPolicyRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				ECPolicy:  aws.String(policy),
+				ECPolicy:  types.Pointer(policy),
 			})
 			if err != nil {
 				t.Fatalf("webhdfs SetECPolicy failed: %s", err)
@@ -3047,7 +3047,7 @@ func TestClient_DisableECPolicy(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -3058,9 +3058,9 @@ func TestClient_DisableECPolicy(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -3072,7 +3072,7 @@ func TestClient_DisableECPolicy(t *testing.T) {
 		func() {
 			resp, err := c.DisableECPolicy(&webhdfs.DisableECPolicyRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				ECPolicy:  aws.String(policy),
+				ECPolicy:  types.Pointer(policy),
 			})
 			if err != nil {
 				t.Fatalf("webhdfs DisableECPolicy"+
@@ -3084,7 +3084,7 @@ func TestClient_DisableECPolicy(t *testing.T) {
 		func() {
 			resp, err := c.SetECPolicy(&webhdfs.SetECPolicyRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				ECPolicy:  aws.String(policy),
+				ECPolicy:  types.Pointer(policy),
 			})
 			if err != nil {
 				t.Logf("webhdfs SetECPolicy failed: %s", err)
@@ -3106,7 +3106,7 @@ func TestClient_SetECPolicy(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -3117,9 +3117,9 @@ func TestClient_SetECPolicy(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -3131,7 +3131,7 @@ func TestClient_SetECPolicy(t *testing.T) {
 		//func() {
 		//	resp, err := c.EnableECPolicy(&webhdfs.EnableECPolicyRequest{
 		//		ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-		//		ECPolicy:  aws.String(policy),
+		//		ECPolicy:  types.Pointer(policy),
 		//	})
 		//	if err != nil {
 		//		t.Fatalf("webhdfs EnableECPolicy"+
@@ -3143,8 +3143,8 @@ func TestClient_SetECPolicy(t *testing.T) {
 		func() {
 			resp, err := c.SetECPolicy(&webhdfs.SetECPolicyRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				ECPolicy:  aws.String(policy),
-				Path:      aws.String(file),
+				ECPolicy:  types.Pointer(policy),
+				Path:      types.Pointer(file),
 			})
 			if err != nil {
 				t.Fatalf("webhdfs SetECPolicy failed: %s", err)
@@ -3167,7 +3167,7 @@ func TestClient_Append(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -3178,7 +3178,7 @@ func TestClient_Append(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
 		})
 		if err != nil {
@@ -3190,7 +3190,7 @@ func TestClient_Append(t *testing.T) {
 	func() {
 		resp, err := c.Append(&webhdfs.AppendRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
 		})
 		if err != nil {
@@ -3202,7 +3202,7 @@ func TestClient_Append(t *testing.T) {
 	func() {
 		resp, err := c.Open(&webhdfs.OpenRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Open failed: %s", err)
@@ -3231,7 +3231,7 @@ func TestClient_Concat(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(srcOneFile),
+			Path:      types.Pointer(srcOneFile),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -3242,7 +3242,7 @@ func TestClient_Concat(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(srcOneFile),
+			Path:      types.Pointer(srcOneFile),
 			Body:      strings.NewReader(writtenData),
 		})
 		if err != nil {
@@ -3254,7 +3254,7 @@ func TestClient_Concat(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(srcTwoFile),
+			Path:      types.Pointer(srcTwoFile),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -3265,7 +3265,7 @@ func TestClient_Concat(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(srcTwoFile),
+			Path:      types.Pointer(srcTwoFile),
 			Body:      strings.NewReader(writtenData),
 		})
 		if err != nil {
@@ -3277,7 +3277,7 @@ func TestClient_Concat(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(concatFile),
+			Path:      types.Pointer(concatFile),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -3288,7 +3288,7 @@ func TestClient_Concat(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(concatFile),
+			Path:      types.Pointer(concatFile),
 			Body:      strings.NewReader(writtenData),
 		})
 		if err != nil {
@@ -3300,8 +3300,8 @@ func TestClient_Concat(t *testing.T) {
 	func() {
 		resp, err := c.Concat(&webhdfs.ConcatRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(concatFile),
-			Sources:   aws.String(strings.Join([]string{srcOneFile, srcTwoFile}, ",")),
+			Path:      types.Pointer(concatFile),
+			Sources:   types.Pointer(strings.Join([]string{srcOneFile, srcTwoFile}, ",")),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Concat failed: %s", err)
@@ -3312,7 +3312,7 @@ func TestClient_Concat(t *testing.T) {
 	func() {
 		resp, err := c.Open(&webhdfs.OpenRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(concatFile),
+			Path:      types.Pointer(concatFile),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Open failed: %s", err)
@@ -3340,7 +3340,7 @@ func TestClient_TruncateZero(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -3351,7 +3351,7 @@ func TestClient_TruncateZero(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
 		})
 		if err != nil {
@@ -3363,8 +3363,8 @@ func TestClient_TruncateZero(t *testing.T) {
 	func() {
 		resp, err := c.Truncate(&webhdfs.TruncateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
-			NewLength: aws.Int64(int64(newLength)),
+			Path:      types.Pointer(file),
+			NewLength: types.Pointer(int64(newLength)),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Append failed: %s", err)
@@ -3376,7 +3376,7 @@ func TestClient_TruncateZero(t *testing.T) {
 	func() {
 		resp, err := c.Open(&webhdfs.OpenRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Open failed: %s", err)
@@ -3405,7 +3405,7 @@ func TestClient_Truncate(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -3416,7 +3416,7 @@ func TestClient_Truncate(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
 		})
 		if err != nil {
@@ -3428,8 +3428,8 @@ func TestClient_Truncate(t *testing.T) {
 	func() {
 		resp, err := c.Truncate(&webhdfs.TruncateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
-			NewLength: aws.Int64(int64(newLength)),
+			Path:      types.Pointer(file),
+			NewLength: types.Pointer(int64(newLength)),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Append failed: %s", err)
@@ -3442,7 +3442,7 @@ func TestClient_Truncate(t *testing.T) {
 	func() {
 		resp, err := c.Open(&webhdfs.OpenRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Open failed: %s", err)
@@ -3477,9 +3477,9 @@ func TestClient_UnsetStoragePolicy(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -3490,7 +3490,7 @@ func TestClient_UnsetStoragePolicy(t *testing.T) {
 	func() {
 		resp, err := c.GetStoragePolicy(&webhdfs.GetStoragePolicyRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs GetStoragePolicy failed: %s", err)
@@ -3507,8 +3507,8 @@ func TestClient_UnsetStoragePolicy(t *testing.T) {
 	func() {
 		resp, err := c.SetStoragePolicy(&webhdfs.SetStoragePolicyRequest{
 			ProxyUser:     c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:          aws.String(file),
-			StoragePolicy: aws.String("HOT"),
+			Path:          types.Pointer(file),
+			StoragePolicy: types.Pointer("HOT"),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs SetStoragePolicy failed: %s", err)
@@ -3518,7 +3518,7 @@ func TestClient_UnsetStoragePolicy(t *testing.T) {
 	func() {
 		resp, err := c.UnsetStoragePolicy(&webhdfs.UnsetStoragePolicyRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs UnsetStoragePolicy failed: %s", err)
@@ -3528,7 +3528,7 @@ func TestClient_UnsetStoragePolicy(t *testing.T) {
 	func() {
 		resp, err := c.GetStoragePolicy(&webhdfs.GetStoragePolicyRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs GetStoragePolicy failed: %s", err)
@@ -3581,7 +3581,7 @@ func TestClient_UnsetECPolicy(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -3592,9 +3592,9 @@ func TestClient_UnsetECPolicy(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -3605,7 +3605,7 @@ func TestClient_UnsetECPolicy(t *testing.T) {
 	func() {
 		resp, err := c.UnsetECPolicy(&webhdfs.UnsetECPolicyRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs UnsetECPolicy failed: %s", err)
@@ -3628,9 +3628,9 @@ func TestClient_Delete(t *testing.T) {
 	func() {
 		resp, err := c.Create(&webhdfs.CreateRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 			Body:      strings.NewReader(writtenData),
-			Overwrite: aws.Bool(true),
+			Overwrite: types.Pointer(true),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Create failed: %s", err)
@@ -3641,7 +3641,7 @@ func TestClient_Delete(t *testing.T) {
 	func() {
 		resp, err := c.Delete(&webhdfs.DeleteRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			t.Fatalf("webhdfs Delete failed: %s", err)
@@ -3652,7 +3652,7 @@ func TestClient_Delete(t *testing.T) {
 	func() {
 		resp, err := c.Open(&webhdfs.OpenRequest{
 			ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-			Path:      aws.String(file),
+			Path:      types.Pointer(file),
 		})
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
@@ -3680,7 +3680,7 @@ func TestClient_DeleteSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.Mkdirs(&webhdfs.MkdirsRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
+				Path:      types.Pointer(dir),
 			})
 			if err != nil {
 				return
@@ -3690,7 +3690,7 @@ func TestClient_DeleteSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.AllowSnapshot(&webhdfs.AllowSnapshotRequest{
 				ProxyUser: c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:      aws.String(dir),
+				Path:      types.Pointer(dir),
 			})
 			if err != nil {
 				return
@@ -3700,8 +3700,8 @@ func TestClient_DeleteSnapshot(t *testing.T) {
 		func() {
 			resp, err := c.DeleteSnapshot(&webhdfs.DeleteSnapshotRequest{
 				ProxyUser:    c.ProxyUser(), // optional, user.name, The authenticated user
-				Path:         aws.String(dir),
-				Snapshotname: aws.String(snapshot),
+				Path:         types.Pointer(dir),
+				Snapshotname: types.Pointer(snapshot),
 			})
 			if err != nil {
 				return

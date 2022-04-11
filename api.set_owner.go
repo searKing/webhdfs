@@ -1,3 +1,7 @@
+// Copyright 2022 The searKing Author. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package webhdfs
 
 import (
@@ -8,7 +12,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/aws/aws-sdk-go/aws"
+	"github.com/searKing/golang/go/exp/types"
 
 	strings_ "github.com/searKing/golang/go/strings"
 
@@ -50,26 +54,26 @@ type SetOwnerResponse struct {
 }
 
 func (req *SetOwnerRequest) RawPath() string {
-	return aws.StringValue(req.Path)
+	return types.Value(req.Path)
 }
 func (req *SetOwnerRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpSetOwner)
 	if req.Authentication.Delegation != nil {
-		v.Set("delegation", aws.StringValue(req.Authentication.Delegation))
+		v.Set("delegation", types.Value(req.Authentication.Delegation))
 	}
 	if req.ProxyUser.Username != nil {
-		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+		v.Set("user.name", types.Value(req.ProxyUser.Username))
 	}
 	if req.ProxyUser.DoAs != nil {
-		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+		v.Set("doas", types.Value(req.ProxyUser.DoAs))
 	}
 
 	if req.Owner != nil {
-		v.Set("owner", aws.StringValue(req.Owner))
+		v.Set("owner", types.Value(req.Owner))
 	}
 	if req.Group != nil {
-		v.Set("group", aws.StringValue(req.Group))
+		v.Set("group", types.Value(req.Group))
 	}
 	return v.Encode()
 }
@@ -127,7 +131,7 @@ func (c *Client) setOwner(ctx context.Context, req *SetOwnerRequest) (*SetOwnerR
 		}
 		httpReq.Close = req.HttpRequest.Close
 		if req.CSRF.XXsrfHeader != nil {
-			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+			httpReq.Header.Set("X-XSRF-HEADER", types.Value(req.CSRF.XXsrfHeader))
 		}
 
 		if ctx != nil {

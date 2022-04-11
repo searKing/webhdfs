@@ -1,3 +1,7 @@
+// Copyright 2022 The searKing Author. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package webhdfs
 
 import (
@@ -8,8 +12,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/aws/aws-sdk-go/aws"
-
+	"github.com/searKing/golang/go/exp/types"
 	strings_ "github.com/searKing/golang/go/strings"
 
 	"github.com/searKing/golang/go/errors"
@@ -67,32 +70,32 @@ type OpenResponse struct {
 }
 
 func (req *OpenRequest) RawPath() string {
-	return aws.StringValue(req.Path)
+	return types.Value(req.Path)
 }
 func (req *OpenRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpOpen)
 	if req.Authentication.Delegation != nil {
-		v.Set("delegation", aws.StringValue(req.Authentication.Delegation))
+		v.Set("delegation", types.Value(req.Authentication.Delegation))
 	}
 	if req.ProxyUser.Username != nil {
-		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+		v.Set("user.name", types.Value(req.ProxyUser.Username))
 	}
 	if req.ProxyUser.DoAs != nil {
-		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+		v.Set("doas", types.Value(req.ProxyUser.DoAs))
 	}
 
 	if req.Offset != nil {
-		v.Set("offset", fmt.Sprintf("%d", aws.Int64Value(req.Offset)))
+		v.Set("offset", fmt.Sprintf("%d", types.Value(req.Offset)))
 	}
 	if req.Length != nil {
-		v.Set("length", fmt.Sprintf("%d", aws.Int64Value(req.Length)))
+		v.Set("length", fmt.Sprintf("%d", types.Value(req.Length)))
 	}
 	if req.BufferSize != nil {
-		v.Set("buffersize", fmt.Sprintf("%d", aws.Int32Value(req.BufferSize)))
+		v.Set("buffersize", fmt.Sprintf("%d", types.Value(req.BufferSize)))
 	}
 	if req.NoDirect != nil {
-		v.Set("noredirect", fmt.Sprintf("%t", aws.BoolValue(req.NoDirect)))
+		v.Set("noredirect", fmt.Sprintf("%t", types.Value(req.NoDirect)))
 	}
 	return v.Encode()
 }
@@ -158,7 +161,7 @@ func (c *Client) open(ctx context.Context, req *OpenRequest) (*OpenResponse, err
 		}
 		httpReq.Close = req.HttpRequest.Close
 		if req.CSRF.XXsrfHeader != nil {
-			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+			httpReq.Header.Set("X-XSRF-HEADER", types.Value(req.CSRF.XXsrfHeader))
 		}
 		if ctx != nil {
 			httpReq = httpReq.WithContext(ctx)
@@ -178,7 +181,7 @@ func (c *Client) open(ctx context.Context, req *OpenRequest) (*OpenResponse, err
 
 		var resp OpenResponse
 		resp.NameNode = addr
-		resp.NoDirect = aws.BoolValue(req.NoDirect)
+		resp.NoDirect = types.Value(req.NoDirect)
 
 		if err := resp.UnmarshalHTTP(httpResp); err != nil {
 			errs = append(errs, err)

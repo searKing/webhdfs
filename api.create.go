@@ -1,3 +1,7 @@
+// Copyright 2022 The searKing Author. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package webhdfs
 
 import (
@@ -9,8 +13,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/aws/aws-sdk-go/aws"
-
+	"github.com/searKing/golang/go/exp/types"
 	http_ "github.com/searKing/golang/go/net/http"
 	strings_ "github.com/searKing/golang/go/strings"
 
@@ -103,38 +106,38 @@ type CreateResponse struct {
 }
 
 func (req *CreateRequest) RawPath() string {
-	return aws.StringValue(req.Path)
+	return types.Value(req.Path)
 }
 func (req *CreateRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpCreate)
 	if req.Authentication.Delegation != nil {
-		v.Set("delegation", aws.StringValue(req.Authentication.Delegation))
+		v.Set("delegation", types.Value(req.Authentication.Delegation))
 	}
 	if req.ProxyUser.Username != nil {
-		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+		v.Set("user.name", types.Value(req.ProxyUser.Username))
 	}
 	if req.ProxyUser.DoAs != nil {
-		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+		v.Set("doas", types.Value(req.ProxyUser.DoAs))
 	}
 
 	if req.Overwrite != nil {
-		v.Set("overwrite", fmt.Sprintf("%t", aws.BoolValue(req.Overwrite)))
+		v.Set("overwrite", fmt.Sprintf("%t", types.Value(req.Overwrite)))
 	}
 	if req.Blocksize != nil {
-		v.Set("blocksize", fmt.Sprintf("%d", aws.Int64Value(req.Blocksize)))
+		v.Set("blocksize", fmt.Sprintf("%d", types.Value(req.Blocksize)))
 	}
 	if req.Replication != nil {
-		v.Set("replication", fmt.Sprintf("%d", aws.IntValue(req.Replication)))
+		v.Set("replication", fmt.Sprintf("%d", types.Value(req.Replication)))
 	}
 	if req.Permission != nil {
-		v.Set("permission", fmt.Sprintf("%#o", aws.IntValue(req.Permission)))
+		v.Set("permission", fmt.Sprintf("%#o", types.Value(req.Permission)))
 	}
 	if req.BufferSize != nil {
-		v.Set("buffersize", fmt.Sprintf("%d", aws.IntValue(req.BufferSize)))
+		v.Set("buffersize", fmt.Sprintf("%d", types.Value(req.BufferSize)))
 	}
 	if req.NoDirect != nil {
-		v.Set("noredirect", fmt.Sprintf("%t", aws.BoolValue(req.NoDirect)))
+		v.Set("noredirect", fmt.Sprintf("%t", types.Value(req.NoDirect)))
 	}
 	return v.Encode()
 }
@@ -205,13 +208,13 @@ func (c *Client) create(ctx context.Context, req *CreateRequest) (*CreateRespons
 		_ = http_.RequestWithBodyRewindable(httpReq)
 		httpReq.Close = req.HttpRequest.Close
 		if req.CSRF.XXsrfHeader != nil {
-			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+			httpReq.Header.Set("X-XSRF-HEADER", types.Value(req.CSRF.XXsrfHeader))
 		}
 
 		// See :https://issues.cloudera.org/browse/HUE-679
 		httpReq.Header.Set("Content-Type", "application/octet-stream")
 		if req.ContentLength != nil {
-			httpReq.ContentLength = aws.Int64Value(req.ContentLength)
+			httpReq.ContentLength = types.Value(req.ContentLength)
 		}
 
 		if ctx != nil {
@@ -232,7 +235,7 @@ func (c *Client) create(ctx context.Context, req *CreateRequest) (*CreateRespons
 
 		var resp CreateResponse
 		resp.NameNode = addr
-		resp.NoDirect = aws.BoolValue(req.NoDirect)
+		resp.NoDirect = types.Value(req.NoDirect)
 
 		if err := resp.UnmarshalHTTP(httpResp); err != nil {
 			errs = append(errs, err)

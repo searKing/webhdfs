@@ -1,3 +1,7 @@
+// Copyright 2022 The searKing Author. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package webhdfs
 
 import (
@@ -8,7 +12,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/aws/aws-sdk-go/aws"
+	"github.com/searKing/golang/go/exp/types"
 
 	strings_ "github.com/searKing/golang/go/strings"
 
@@ -51,19 +55,19 @@ type SetTimesResponse struct {
 }
 
 func (req *SetTimesRequest) RawPath() string {
-	return aws.StringValue(req.Path)
+	return types.Value(req.Path)
 }
 func (req *SetTimesRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpSetTimes)
 	if req.Authentication.Delegation != nil {
-		v.Set("delegation", aws.StringValue(req.Authentication.Delegation))
+		v.Set("delegation", types.Value(req.Authentication.Delegation))
 	}
 	if req.ProxyUser.Username != nil {
-		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+		v.Set("user.name", types.Value(req.ProxyUser.Username))
 	}
 	if req.ProxyUser.DoAs != nil {
-		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+		v.Set("doas", types.Value(req.ProxyUser.DoAs))
 	}
 
 	if req.Modificationtime != nil {
@@ -131,7 +135,7 @@ func (c *Client) setTimes(ctx context.Context, req *SetTimesRequest) (*SetTimesR
 		}
 		httpReq.Close = req.HttpRequest.Close
 		if req.CSRF.XXsrfHeader != nil {
-			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+			httpReq.Header.Set("X-XSRF-HEADER", types.Value(req.CSRF.XXsrfHeader))
 		}
 
 		if ctx != nil {

@@ -1,3 +1,7 @@
+// Copyright 2022 The searKing Author. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package webhdfs
 
 import (
@@ -8,9 +12,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/aws/aws-sdk-go/aws"
-
 	"github.com/searKing/golang/go/errors"
+	"github.com/searKing/golang/go/exp/types"
 )
 
 type GetSnapshotDiffRequest struct {
@@ -50,26 +53,26 @@ type GetSnapshotDiffResponse struct {
 }
 
 func (req *GetSnapshotDiffRequest) RawPath() string {
-	return aws.StringValue(req.Path)
+	return types.Value(req.Path)
 }
 func (req *GetSnapshotDiffRequest) RawQuery() string {
 	v := url.Values{}
 	v.Set("op", OpGetSnapshotDiff)
 	if req.Authentication.Delegation != nil {
-		v.Set("delegation", aws.StringValue(req.Authentication.Delegation))
+		v.Set("delegation", types.Value(req.Authentication.Delegation))
 	}
 	if req.ProxyUser.Username != nil {
-		v.Set("user.name", aws.StringValue(req.ProxyUser.Username))
+		v.Set("user.name", types.Value(req.ProxyUser.Username))
 	}
 	if req.ProxyUser.DoAs != nil {
-		v.Set("doas", aws.StringValue(req.ProxyUser.DoAs))
+		v.Set("doas", types.Value(req.ProxyUser.DoAs))
 	}
 
 	if req.Oldsnapshotname != nil {
-		v.Set("oldsnapshotname", aws.StringValue(req.Oldsnapshotname))
+		v.Set("oldsnapshotname", types.Value(req.Oldsnapshotname))
 	}
 	if req.Snapshotname != nil {
-		v.Set("snapshotname", aws.StringValue(req.Snapshotname))
+		v.Set("snapshotname", types.Value(req.Snapshotname))
 	}
 	return v.Encode()
 }
@@ -127,7 +130,7 @@ func (c *Client) getSnapshotDiff(ctx context.Context, req *GetSnapshotDiffReques
 		}
 		httpReq.Close = req.HttpRequest.Close
 		if req.CSRF.XXsrfHeader != nil {
-			httpReq.Header.Set("X-XSRF-HEADER", aws.StringValue(req.CSRF.XXsrfHeader))
+			httpReq.Header.Set("X-XSRF-HEADER", types.Value(req.CSRF.XXsrfHeader))
 		}
 		if ctx != nil {
 			httpReq = httpReq.WithContext(ctx)
